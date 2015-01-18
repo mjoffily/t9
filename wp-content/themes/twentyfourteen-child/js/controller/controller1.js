@@ -1,21 +1,16 @@
-(function() {
-  'use strict';
+  .controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', function($scope, $parse, ngDialog) {
+	$scope.canvas = new fabric.Canvas('c');
+	$scope.groups = new Array();
+	$scope.tops = 0;
+	$scope.minWidth = 100;
+	$scope.minHeight = 100;
+	$scope.padding = 10;  
+	$scope.topPadding = 30;  
+	$scope.editorEnabled = false;
+	$scope.showJson = false;
+	$scope.shapes = ['rectangle', 'circle', 'triangle', 'elipse'];
 
-  angular.module('treeApp', ['ui.tree', 'colorpicker.module', 'ngDialog', 'xeditable', 'ui.router'])
-  .config(function($stateProvider, $urlRouterProvider) {
-  	$stateProvider.state('home', {url: "/home", 
-  								  templateUrl: SiteParameters.theme_directory + '/page-templatess/main-view.html'})
-  				.state('home.file', {url: "/file/:idx", 
-  								templateUrl: SiteParameters.theme_directory + '/page-templatess/file-selected.html',
-  								controller: 'fileCtrl'})
-  				.state('home.file.diagram', {url: "/diagram", 
-  								templateUrl: SiteParameters.theme_directory + '/page-templatess/diagram-view.html',
-  								controller: 'diagramCtrl'})
-  				
-  })
-  
-  .controller('treeCtrl', ['$scope', function($scope) {
-  	alert('treeController');
+	
     $scope.data = [{ "envId": 1, "envName": "name1", "nodes": [{
       "id": 2,
 	  "type": "node",
@@ -108,38 +103,12 @@
       ],
     }]},
     {"envId": 2, "envName": "test2", "nodes": []}];
-	$scope.newFile = function() {
-	  var a = {"envId": 1, "envName": "new file", "nodes": []};
-      $scope.data.push(a);
-	if (1 == 1) {
-		alert('here');
-	}
-	}
-	
-}])
-.controller('fileCtrl', ['$scope', '$stateParams', function($scope, $stateParams) {
-	$scope.idx = $stateParams.idx;
-	//alert($scope.data[$scope.data.length - 1].envName)
-}])
-
-.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', function($scope, $parse, ngDialog, $stateParams) {
-	$scope.canvas = new fabric.Canvas('c');
-	$scope.groups = new Array();
-	$scope.tops = 0;
-	$scope.minWidth = 100;
-	$scope.minHeight = 100;
-	$scope.padding = 10;  
-	$scope.topPadding = 30;  
-	$scope.editorEnabled = false;
-	$scope.showJson = false;
-	$scope.shapes = ['rectangle', 'circle', 'triangle', 'elipse'];
 	
 	$scope.referencesPerLevel = [];
-	$scope.file = $scope.data[$stateParams.idx].nodes;
 	
     $scope.buildReferencesToNodesPerLevel = function() {
 		$scope.referencesPerLevel = [];
-		$scope.recurseNodes($scope.file, 0);
+		$scope.recurseNodes($scope.data, 0);
     };
 
 	$scope.recurseNodes = function(nodes, level) {
@@ -205,8 +174,8 @@
 	}
 
     $scope.moveLastToTheBeginning = function () {
-      var a = $scope.file.pop();
-      $scope.file.splice(0,0, a);
+      var a = $scope.data.pop();
+      $scope.data.splice(0,0, a);
     };
 
     $scope.addNewNode = function () {
@@ -228,7 +197,7 @@
 		},
         children: []
       };
-      $scope.file.splice(0,0, a);
+      $scope.data.splice(0,0, a);
     };
 
     $scope.addNewLineBreak = function () {
@@ -239,7 +208,7 @@
 		formatting: {height: 10},
         children: []
       };
-      $scope.file.splice(0,0, a);
+      $scope.data.splice(0,0, a);
     };
 
     $scope.newSubItem = function(scope) {
@@ -277,10 +246,10 @@
 	    $scope.canvas.clear();
 		
 		// calculate the width and height and x coordinate for all elements
-		for(var i = 0; i<$scope.file.length; i++) {
-		    var elem = $scope.file[i];
-			$scope.sumWidth(i, elem, elem.children, $scope.file);
-			$scope.sumHeight(i, elem, elem.children, $scope.file);
+		for(var i = 0; i<$scope.data.length; i++) {
+		    var elem = $scope.data[i];
+			$scope.sumWidth(i, elem, elem.children, $scope.data);
+			$scope.sumHeight(i, elem, elem.children, $scope.data);
 		}
 		
 
@@ -289,8 +258,8 @@
 		var offsetTop = 0;
 		var heighest = 0;
 		var line = 0;
-		for(var i=0; i<$scope.file.length; i++) {
-			var elem = $scope.file[i];
+		for(var i=0; i<$scope.data.length; i++) {
+			var elem = $scope.data[i];
 		    elem.formatting.line = line;
 			
 			// don't render or calculate y if this is a line break symbol
@@ -299,8 +268,8 @@
 				continue;
 			}
 			
-			$scope.setTopLevelY(elem, $scope.file, i, line);
-		    $scope.render({elem:elem, siblings:$scope.file});
+			$scope.setTopLevelY(elem, $scope.data, i, line);
+		    $scope.render({elem:elem, siblings:$scope.data});
 		}
 	};
 
@@ -566,7 +535,7 @@
 	
 	
 	
-	$scope.$watch("file", function( newValue, oldValue ) {
+	$scope.$watch("data", function( newValue, oldValue ) {
 		$scope.draw();
     }, true);
 				
@@ -600,6 +569,5 @@
         }
 	};
 });
-
 
 })();
