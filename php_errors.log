@@ -1,0 +1,1 @@
+[11-Jan-2015 13:52:57 UTC] PHP Fatal error:  Call to undefined function curl_init() in /home/ubuntu/workspace/wp-content/plugins/easy-pricing-tables/includes/pointer.php on line 218

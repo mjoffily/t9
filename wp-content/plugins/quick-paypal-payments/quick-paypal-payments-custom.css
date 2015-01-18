@@ -1,0 +1,13 @@
+
+        .qpp-style.default .floatleft{float:left;}
+        .qpp-style.default .floatright {float:right;text-align:right;}
+        .qpp-style.default .floatright input {width:3em;text-align:right;}
+        .qpp-style.default input#total_price, .qpp-style.default input#total_postage, .qpp-style.default input#total_process, .qpp-style.default input#total_products {text-align:right;border:none;}.qpp-style.default {width:280px;}
+.qpp-style.default #plain {border:1px solid #415063;}
+.qpp-style.default input[type=text], .qpp-style.default textarea, .qpp-style.default select, .qpp-style.default #submit {border-radius:0;}
+.qpp-style.default p{font-family: arial, sans-serif; font-size: 1em;color: #465069;line-height:100%;;}
+.qpp-style.default input[type=text]{border: 1px solid #415063;font-family: arial, sans-serif; font-size: 1em; color: #465069;;font-size: inherit;height:auto;line-height:normal;}
+.qpp-style.default div {background:#FFF;}
+.qpp-style.default #submit, .qpp-style.default #submit:hover {float:left;width:100%;color:#FFF;background:#343838;border:1px solid #415063;font-family: arial, sans-serif;font-size: inherit;}
+.qpp-style.default #couponsubmit, .qpp-style.default #couponsubmit:hover{float:left;width:100%;color:#FFF;background:#1f8416;border:1px solid #415063;font-family: arial, sans-serif;font-size: inherit;margin: 3px 0px 7px;
+padding: 6px;}
