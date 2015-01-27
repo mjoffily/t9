@@ -26,8 +26,9 @@ function t9_scripts() {
 	wp_enqueue_style( 'ngDialogTheme', get_stylesheet_directory_uri() . '/css/ngDialog-theme-default.css');
 	wp_enqueue_style( 'xeditable', get_stylesheet_directory_uri() . '/css/xeditable.css');
 
-    wp_enqueue_script( 'angular-script', get_stylesheet_directory_uri() . '/js/angular.min.js');
+    wp_enqueue_script( 'angular-script', get_stylesheet_directory_uri() . '/js/angular.js');
     wp_enqueue_script( 'angularUi-script', get_stylesheet_directory_uri() . '/js/angular-ui-tree.js');
+    wp_enqueue_script( 'angular-ui-router-script', get_stylesheet_directory_uri() . '/js/angular-ui-router.js');
     wp_enqueue_script( 'fabric-script', get_stylesheet_directory_uri() . '/js/fabric.js');
     wp_enqueue_script( 'colorpicker-script', get_stylesheet_directory_uri() . '/js/bootstrap-colorpicker-module.min.js');
     wp_enqueue_script( 'ngDialog-script', get_stylesheet_directory_uri() . '/js/ngDialog.js');
