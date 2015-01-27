@@ -1,0 +1,22 @@
+  <div id="treeNodes">
+    
+  <div class="top-header" id="topHeader">
+    <h3>Tree view</h3>
+    <a href="" class="btn btn-default " ng-click="draw()">Draw</a>
+    <a href="" class="btn btn-default " ng-click="collapseAll()">Collapse all</a>
+    <a href="" class="btn btn-default " ng-click="expandAll()">Expand all</a>
+    <a href="" class="btn btn-default " ng-click="addNewNode(fileIndex)">Add new node</a>
+    <a href="" class="btn btn-default " ng-click="addNewLineBreak(fileIndex)">Add new LB</a>   
+    <a href="" class="btn btn-default " ng-click="moveLastToTheBeginning()">LtoB</a>
+    <a href="" class="btn btn-default " ng-click="toggleJson()">Json</a>
+  </div>
+  <div class="col-lg-2" id="tree-root">
+
+    <!-- Nested node template -->
+    <div ui-tree >
+      <ol ui-tree-nodes ng-model="file">
+        <li editable-text="node.title" ng-repeat="node in file" ui-tree-node ng-include="'https://source-mjoffily.c9.io/wp-content/themes/twentyfourteen-child/js/partials/nodes-renderer.html'" ng-class="{nodrag : node.editorEnabled}"></li>
+      </ol>
+    </div>
+  </div>
+  </div>

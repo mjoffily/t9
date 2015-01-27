@@ -1,0 +1,35 @@
+<div class="row">
+
+<treeview></treeview>
+
+
+<div class="col-lg-2" ng-show="showJson">
+    <h3>Data binding</h3>
+    <div class="info">
+        {{info}}
+    </div>
+    <pre class="code">{{ file | json }}</pre>
+</div>
+
+<div id="flatViewDiv">
+    <div id="filteringDiv">
+        
+        <span>Display columns:</span><input ng-model="numColumns">
+        <span>Filter title:</span><input type="text" ng-model="searchtitle">
+        <span>Filter name:</span><input type="text" ng-model="searchname.name">
+        <span>Filter value:</span><input type="text" ng-model="searchvalue.value">
+        
+    </div>
+    <div ng-repeat="row in rows(numColumns) track by $index" ng-init="rowIndex = $index" class="gridRow">
+        <div ng-repeat="column in columns() track by $index" ng-init="columnIndex = $index" class="gridColumn" ng-if="filterednodes.length > ($index + (numColumns*rowIndex))">
+            <!--We are indexing the flatnodes deriving it from the current row and column -->
+                <span>{{filterednodes[columnIndex + (numColumns*rowIndex)].title}}</span><a ng-click="addRow($index + (numColumns*rowIndex))" href=""> add row </a>
+
+                <div  ng-repeat="f in filterednodes[columnIndex + (numColumns*rowIndex)].metadata | filter:searchname |  filter:searchvalue track by $index">
+                    <div class="data" editable-text="f.name">{{f.name}}</div>
+                    <div editable-text="f.value">{{f.value}} {{$index}}</div>
+                </div>
+        </div>
+    </div>
+</div>
+</div>

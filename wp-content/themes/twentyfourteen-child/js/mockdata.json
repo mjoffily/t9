@@ -1,0 +1,99 @@
+[{ "envId": 1, "envName": "name1", "nodes": [{
+      "id": 2,
+	  "type": "node",
+      "title": "node2",
+	  "formatting": {
+			"strokeWidth": 2,
+			"showas": "rectangle",
+			"borderColor": "black",
+			"fill": "#B19CD8",
+			"fontFamily" : "Verdana, Geneva, sans-serif",
+			"fontColor" : "#FFFFFF",
+			"fontSize" : 10,
+			"level": 0
+		},
+	  "metadata" : [{"name": "server type", "value": "unix"},{"name": "memory", "value": "10Gb"}],
+	  "width" : 0,
+	  "height" : 0,
+      "children": [
+        {
+          "id": 21,
+		  "type": "node",
+          "title": "node2.1",
+		  "formatting": {
+				"strokeWidth": 2,
+				"showas": "rectangle",
+				"borderColor": "black",
+				"fill": "#B19CD8",
+				"fontFamily" : "Verdana, Geneva, sans-serif",
+				"fontColor" : "#FFFFFF",
+				"fontSize" : 10,
+				"level": 1
+			},
+		  "metadata" : [{"name": "server type", "value": "microsoft"},{"name": "color", "value": "green"}],
+		  "width" : 0,
+		  "height" : 0,
+          "children": []
+        },
+        {
+          "id": 22,
+		  "type": "node",
+          "title": "node2.2",
+		  "formatting": {
+				"strokeWidth": 2,
+				"showas": "rectangle",
+				"borderColor": "black",
+				"fill": "#B19CD8",
+				"fontFamily" : "Verdana, Geneva, sans-serif",
+				"fontColor" : "#FFFFFF",
+				"fontSize" : 10,
+				"level": 0
+			},
+		  "metadata" : [{"name": "server type", "value": "microsoft"},{"name": "color", "value": "black"}],
+		  "width" : 0,
+		  "height" : 0,
+          "children": []
+        }
+      ]
+    }, {
+      "id": 3,
+      "type": "node",
+      "title": "node3",
+		  "formatting": {
+				"strokeWidth": 2,
+				"showas": "rectangle",
+				"borderColor": "black",
+				"fill": "#B19CD8",
+				"fontFamily" : "Verdana, Geneva, sans-serif",
+				"fontColor" : "#FFFFFF",
+				"fontSize" : 10,
+				"level": 0
+			},
+		  "metadata" : [{"name": "server type", "value": "apple"},{"name": "color", "value": "pink"}],
+	  "width" : 0,
+	  "height" : 0,
+      "children": [
+        {
+          "id": 31,
+		  "type": "node",
+          "title": "node3.1",
+		  "formatting": {
+				"strokeWidth": 2,
+				"showas": "rectangle",
+				"borderColor": "black",
+				"fill": "#B19CD8",
+				"fontFamily" : "Verdana, Geneva, sans-serif",
+				"fontColor" : "#FFFFFF",
+				"fontSize" : 10,
+				"level": 0
+			},
+		  "metadata" : [{"name": "server type", "value": "microsoft"},{"name": "color", "value": "orange"}],
+		  "width" : 0,
+		  "height" : 0,
+          "children": []
+        }
+      ]
+    }]},
+    {"envId": 2, "envName": "test2", "nodes": []}]
+    
+    
