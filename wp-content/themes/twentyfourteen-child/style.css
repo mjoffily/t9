@@ -14,11 +14,111 @@
 
 @import url("../twentyfourteen/style.css");
 
-.top-header {margin-bottom: 50px;}
+.top-header {margin-bottom: 15px;}
+.site-header { 
+ max-width: inherit;
+}
 .spacer {
     width: 100%;
     height: 50px;
 }
 div.content {
  min-height: 600px;
+}
+
+div[ng-app] {
+    margin: 50px;
+}
+nice, td {
+    border: 2px dotted green;
+    vertical-align: top;
+    padding: 5px;
+    text-align: center;
+    font-size: 10px;
+}
+.data {
+    border-right: 1px dashed;
+    border-collapse: collapse;
+    border-color: green;
+    float:left;
+    width: 50%;
+}
+.nicecolumnEven {
+    border: dashed;
+    border-width: 1.5px;
+    border-color: black;
+    background-color:pink;
+    padding: 2px;
+}
+.nicecolumnOdd {
+    border: dashed;
+    border-width: 1.5px;
+    border-color: black;
+    background-color:purple;
+    padding: 2px;
+}
+
+#diagramRow {
+ border: 3px dashed green;
+}
+
+
+#tree-root {
+ border: 1px solid blue;
+ width: 100%;
+}
+
+#topHeader {
+ border: 2px solid orange;
+ width: 100%;
+}
+
+#treeNodes {
+ border: 3px dashed purple;
+ float: left;
+ width: 30%;
+}
+
+#canvasDiv {
+ border: 3px dashed pink;
+ float: left;
+ width: 70%;
+}
+
+#selectViewDiv {
+ border: 2px solid blueviolet;
+}
+
+#flatViewDiv {
+ border: 2px groove orange;
+ float: left;
+ width: 70%;
+ padding-left: 20px;
+ padding-right: 20px;
+}
+
+.gridRow {
+ border: 3px solid black;
+ overflow: hidden;
+}
+.gridColumn {
+ border: 3px groove purple;
+ float: left;
+ position: relative;
+}
+
+#fileSelectContainer {
+ border: 3px dashed pink;
+  overflow: hidden;
+}
+
+#fileSelect {
+ border: 3px solid black;
+ float:left;
+}
+#fileName {
+ border: 3px dotted red;
+ float:left;
+ font-size: 16px;
+ margin-left:40px;
 }

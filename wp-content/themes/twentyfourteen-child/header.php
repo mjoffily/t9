@@ -19,7 +19,7 @@
 <html <?php language_attributes(); ?>>
 <!--<![endif]-->
 <head>
-	<base href="https://source-mjoffily.c9.io/the-diagrams-page/" />
+	<base href="https://source-mjoffily.c9.io/go/" />
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width">
 	<title><?php wp_title( '|', true, 'right' ); ?></title>
