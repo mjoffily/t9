@@ -15,6 +15,8 @@
     <div id="fileName">
         <span editable-text="currentFile.envName">{{currentFile.envName}}</span>
     </div>
+    <button ng-click="save()">Save</button>
+
 </div>
     <div ui-view></div>
 </div>

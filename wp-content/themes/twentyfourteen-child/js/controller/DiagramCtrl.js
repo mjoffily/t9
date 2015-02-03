@@ -1,6 +1,7 @@
-app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', 't9Service', function($scope, $parse, ngDialog, $stateParams, t9Service) {
+app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', 't9Service', '$filter', function($scope, $parse, ngDialog, $stateParams, t9Service, $filter) {
 	$scope.canvas = new fabric.Canvas('c');
 	$scope.canvas.setBackgroundColor("#CEF6E3");
+
 	$scope.groups = new Array();
 	$scope.tops = 0;
 	$scope.minWidth = 100;
@@ -43,7 +44,11 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 
 	$scope.clickToOpen = function (currentNode) {
 	    $scope.currentNode = currentNode.$modelValue;
-        ngDialog.openConfirm({ template: SiteParameters.theme_directory + '/popup.html', scope: $scope });
+	    if ($scope.currentNode.type === 'formatting') {
+	        ngDialog.openConfirm({ template: SiteParameters.theme_directory + '/js/partials/popup-linebreak-properties.html', scope: $scope });
+	    } else {
+        	ngDialog.openConfirm({ template: SiteParameters.theme_directory + '/js/partials/popup.html', scope: $scope });
+	    }
     };
 	
 	$scope.applyFillColorToSibilings = function(currentNode) {
@@ -124,6 +129,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 			if (elemIndex == 0) {
 				elem.formatting.y = 0;
 			} else {
+				// element will have the same y as its sibiling
 				elem.formatting.y = siblings[elemIndex-1].formatting.y;
 			}
 		} else {
@@ -145,8 +151,8 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 	$scope.getHighestHeight = function(data, from, to) {
 		var highest = 0;
 		for (var i = from; i <= to; i++) {
-			if (data[i].height > highest) 
-				highest = data[i].height;
+			if (data[i].formatting.height > highest) 
+				highest = data[i].formatting.height;
 		}
 		return highest;
 	}
@@ -159,10 +165,15 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 		var textTop = 0;
 		// if it has children, set text at the top of poligon, to give space to the children to be rendered
 		if (renderObj.elem.children.length > 0) {
-			var textTop = -((renderObj.elem.height / 2) - $scope.padding);
+			var textTop = -((renderObj.elem.formatting.height / 2) - $scope.padding);
 		}
 		
-		var text = new fabric.Text(renderObj.elem.title, { fill : renderObj.elem.formatting.fontColor, fontSize: renderObj.elem.formatting.fontSize, fontFamily: renderObj.elem.formatting.fontFamily, originX: 'center', originY: 'center', top: textTop });
+		var text = new fabric.Text(renderObj.elem.title, { fill : renderObj.elem.formatting.fontColor, fontSize: renderObj.elem.formatting.fontSize
+		, fontFamily: renderObj.elem.formatting.fontFamily
+		, originX: 'center'
+		, originY: 'center'
+		, top: textTop });
+		
 		var poligon = $scope.renderPoligon(renderObj.elem);
 		var group = new fabric.Group([ poligon, text ], {
 					  lockScalingX: false,
@@ -174,6 +185,10 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 					  cornerSize: 7});
 
 		$scope.canvas.add(group);
+		group.on('selected', function(e) {
+  console.log('selected a group ' + e.type);
+});
+
 		
 			// debug
 		    //alert('Line:' + i + ' X:' + elem.formatting.x + ' | Y:' + elem.formatting.y + ' ' + elem.title );
@@ -218,9 +233,9 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 
 	$scope.renderPoligon = function renderPoligon(elem) {
 		if (elem.formatting.showas == 'rectangle') {
-			return new fabric.Rect({
-							width: elem.width,
-							height: elem.height,
+			var obj = new fabric.Rect({
+							width: elem.formatting.width,
+							height: elem.formatting.height,
 							originX: 'center',
 							originY: 'center',
 							rx: 10,
@@ -230,9 +245,13 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 							//left: offset,
 							//top: offsetTop,
 							fill: elem.formatting.fill});
+			obj.on('selected', function() {
+			  console.log('selected a rectangle');
+			});							
+			return obj;
 		} else if (elem.showas == 'circle') {
 			return new fabric.Circle({
-							radius: elem.width / 2,
+							radius: elem.formatting.width / 2,
 							left: elem.formatting.x,
 							top: elem.formatting.y,
 							fill: elem.fill});
@@ -243,7 +262,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 	    if (elem.type == 'formatting') {
 			return;
 		}
-	    elem.width = 0;
+	    elem.formatting.width = 0;
 		elem.formatting.x = 0;
 		var widthPerLine = [0,0,0,0,0];
 		var idx = 0;
@@ -252,7 +271,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 		var previousElementIdx = elemIdx - 1;
 		if (previousElementIdx >= 0) {
 			if (elemPeers[previousElementIdx].type != 'formatting') {
-				elem.formatting.x = elemPeers[previousElementIdx].formatting.x + elemPeers[previousElementIdx].width + $scope.padding;
+				elem.formatting.x = elemPeers[previousElementIdx].formatting.x + elemPeers[previousElementIdx].formatting.width + $scope.padding;
 			}
 		}  
 		
@@ -271,29 +290,28 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 			var previousChildIdx = i - 1;
 			if (previousChildIdx >= 0) {
 				if (children[previousChildIdx].type != 'formatting') {
-					child.formatting.x = children[previousChildIdx].formatting.x + children[previousChildIdx].width + $scope.padding;
+					child.formatting.x = children[previousChildIdx].formatting.x + children[previousChildIdx].formatting.width + $scope.padding;
 				}
 			}  
 						
 			if (child.children.length > 0) {
 				$scope.sumWidth(i, child, child.children, children);
 			}
-			if (child.width < $scope.minWidth) {
-				child.width = $scope.minWidth;
+			if (child.formatting.width < $scope.minWidth) {
+				child.formatting.width = $scope.minWidth;
 			}
 			
 			// save width for the current line
-			widthPerLine[idx] = widthPerLine[idx] + child.width + $scope.padding;
-//			alert('Line ' + idx + '| child ' + child.title + ' | child width: ' + child.width + ' | elem ' + elem.title + ' | ' + widthPerLine[idx]);
+			widthPerLine[idx] = widthPerLine[idx] + child.formatting.width + $scope.padding;
 		};
 		
 		// Sort the line widths so we can get the heighest number. The width of the elem must be the 
 		// at least the width of the longest line (assuming page breaks)
 		widthPerLine.sort(function(a, b) {return a-b});
-		elem.width = widthPerLine[widthPerLine.length - 1] + ($scope.padding);
+		elem.formatting.width = widthPerLine[widthPerLine.length - 1] + ($scope.padding);
 				
-		if (elem.width < $scope.minWidth) {
-			elem.width = $scope.minWidth;
+		if (elem.formatting.width < $scope.minWidth) {
+			elem.formatting.width = $scope.minWidth;
 		}
 	};
 
@@ -314,7 +332,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 		
 		for (var i=0; i < children.length; i++) {
 			var child = children[i];
-			if (child.type == 'formatting') {
+			if (child.type === 'formatting') {
 				idx++;
 			    continue;
 			}
@@ -334,13 +352,13 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 			if (child.children.length > 0) {
 				$scope.sumHeight(i, child, child.children, children);
 			}
-			if (child.height < $scope.minHeight) {
-				child.height = $scope.minHeight;
+			if (child.formatting.height < $scope.minHeight) {
+				child.formatting.height = $scope.minHeight;
 			}
 			
 			// save height for the current line
-			if (child.height > heightPerLine[idx]) {
-				heightPerLine[idx] = child.height + $scope.padding;
+			if (child.formatting.height > heightPerLine[idx]) {
+				heightPerLine[idx] = child.formatting.height + $scope.padding;
 			}
 			
 			// debug
@@ -359,13 +377,18 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 			elem.formatting.heightPerLine[i] = {"line": i, "height": heightPerLine[i]};
 		}
 		var elemExpectedMinHeight = (totalHeight + $scope.padding + $scope.topPadding);
-		elem.height = elemExpectedMinHeight;
+
+		// set minimum height if the object is shorter than minimum
+		// otherwise do nothing as the user may have set the hight
+		if (elem.formatting.height < elemExpectedMinHeight) {
+			elem.formatting.height = elemExpectedMinHeight;
+		}
 		
-		if (elem.height < $scope.minHeight) {
+		if (elem.formatting.height < $scope.minHeight) {
 			if (children.length > 0) {
-				elem.height = $scope.minHeight + $scope.padding * 2;
+				elem.formatting.height = $scope.minHeight + $scope.padding * 2;
 			} else {
-				elem.height = $scope.minHeight;
+				elem.formatting.height = $scope.minHeight;
 			}
 		}
 	};
@@ -373,7 +396,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 	$scope.print = function print(data, level) {
 		level++;
 		data.forEach(function(elem) { 
-			console.log(level + ' ' + elem.title + ' ' + elem.width + ' height: ' + elem.height );
+			console.log(level + ' ' + elem.title + ' ' + elem.formatting.width + ' height: ' + elem.formatting.height );
 			$scope.print(elem.children, level);
 		});
 	};
@@ -381,9 +404,11 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 	
 	
 	
-	$scope.$watch("file", function( newValue, oldValue ) {
+	//$scope.$watch("file", function( newValue, oldValue ) {
+	//	$scope.draw();
+    //}, true);
+	$scope.applyChanges = function() {
 		$scope.draw();
-    }, true);
-				
+	}			
 	
   }]);

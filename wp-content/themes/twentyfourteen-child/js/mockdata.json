@@ -1,99 +1,855 @@
-[{ "envId": 1, "envName": "name1", "nodes": [{
-      "id": 2,
-	  "type": "node",
-      "title": "node2",
-	  "formatting": {
-			"strokeWidth": 2,
-			"showas": "rectangle",
-			"borderColor": "black",
-			"fill": "#B19CD8",
-			"fontFamily" : "Verdana, Geneva, sans-serif",
-			"fontColor" : "#FFFFFF",
-			"fontSize" : 10,
-			"level": 0
-		},
-	  "metadata" : [{"name": "server type", "value": "unix"},{"name": "memory", "value": "10Gb"}],
-	  "width" : 0,
-	  "height" : 0,
-      "children": [
+[{ "envId": 1, "envName": "name1", "maxId": 6, "nodes": [{
+    "id": 7,
+    "type": "node",
+    "title": "eCommerce Physical View",
+    "formatting": {
+      "strokeWidth": 0,
+      "width": 660,
+      "height": 80,
+      "showas": "rectangle",
+      "borderColor": "black",
+      "fill": "#f7f7f7",
+      "fontFamily": "Verdana, Geneva, sans-serif",
+      "fontColor": "#292121",
+      "fontSize": 27,
+      "level": 0,
+      "x": 0,
+      "y": 0,
+      "numLines": 1,
+      "heightPerLine": [
         {
-          "id": 21,
-		  "type": "node",
-          "title": "node2.1",
-		  "formatting": {
-				"strokeWidth": 2,
-				"showas": "rectangle",
-				"borderColor": "black",
-				"fill": "#B19CD8",
-				"fontFamily" : "Verdana, Geneva, sans-serif",
-				"fontColor" : "#FFFFFF",
-				"fontSize" : 10,
-				"level": 1
-			},
-		  "metadata" : [{"name": "server type", "value": "microsoft"},{"name": "color", "value": "green"}],
-		  "width" : 0,
-		  "height" : 0,
-          "children": []
+          "line": 0,
+          "height": 0
+        }
+      ],
+      "line": 0,
+      "nodeselected": false
+    },
+    "metadata": [],
+    "children": []
+  },
+  {
+    "id": 43,
+    "type": "node",
+    "title": "",
+    "formatting": {
+      "strokeWidth": 0,
+      "width": 240,
+      "height": 100,
+      "showas": "rectangle",
+      "borderColor": "black",
+      "fill": "#f7f7f7",
+      "fontFamily": "Verdana, Geneva, sans-serif",
+      "fontColor": "#ffffff",
+      "fontSize": 10,
+      "level": 0,
+      "x": 670,
+      "y": 0,
+      "numLines": 1,
+      "heightPerLine": [
+        {
+          "line": 0,
+          "height": 0
+        }
+      ],
+      "line": 0,
+      "nodeselected": false
+    },
+    "metadata": [],
+    "children": []
+  },
+  {
+    "id": 42,
+    "type": "node",
+    "title": "",
+    "formatting": {
+      "strokeWidth": 0,
+      "width": 200,
+      "height": 130,
+      "showas": "rectangle",
+      "borderColor": "black",
+      "fill": "#f7f7f7",
+      "fontFamily": "Verdana, Geneva, sans-serif",
+      "fontColor": "#FFFFFF",
+      "fontSize": 10,
+      "level": 0,
+      "x": 920,
+      "y": 0,
+      "numLines": 3,
+      "heightPerLine": [
+        {
+          "line": 0,
+          "height": 30
         },
         {
-          "id": 22,
-		  "type": "node",
-          "title": "node2.2",
-		  "formatting": {
-				"strokeWidth": 2,
-				"showas": "rectangle",
-				"borderColor": "black",
-				"fill": "#B19CD8",
-				"fontFamily" : "Verdana, Geneva, sans-serif",
-				"fontColor" : "#FFFFFF",
-				"fontSize" : 10,
-				"level": 0
-			},
-		  "metadata" : [{"name": "server type", "value": "microsoft"},{"name": "color", "value": "black"}],
-		  "width" : 0,
-		  "height" : 0,
-          "children": []
-        }
-      ]
-    }, {
-      "id": 3,
-      "type": "node",
-      "title": "node3",
-		  "formatting": {
-				"strokeWidth": 2,
-				"showas": "rectangle",
-				"borderColor": "black",
-				"fill": "#B19CD8",
-				"fontFamily" : "Verdana, Geneva, sans-serif",
-				"fontColor" : "#FFFFFF",
-				"fontSize" : 10,
-				"level": 0
-			},
-		  "metadata" : [{"name": "server type", "value": "apple"},{"name": "color", "value": "pink"}],
-	  "width" : 0,
-	  "height" : 0,
-      "children": [
+          "line": 1,
+          "height": 30
+        },
         {
-          "id": 31,
-		  "type": "node",
-          "title": "node3.1",
-		  "formatting": {
-				"strokeWidth": 2,
-				"showas": "rectangle",
-				"borderColor": "black",
-				"fill": "#B19CD8",
-				"fontFamily" : "Verdana, Geneva, sans-serif",
-				"fontColor" : "#FFFFFF",
-				"fontSize" : 10,
-				"level": 0
-			},
-		  "metadata" : [{"name": "server type", "value": "microsoft"},{"name": "color", "value": "orange"}],
-		  "width" : 0,
-		  "height" : 0,
-          "children": []
+          "line": 2,
+          "height": 30
+        }
+      ],
+      "line": 0,
+      "nodeselected": false
+    },
+    "metadata": [],
+    "children": [
+      {
+        "id": 44,
+        "type": "node",
+        "title": "Separately managed resource",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 180,
+          "height": 20,
+          "fill": "#aeadb8",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 930,
+          "y": 30,
+          "line": 0,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 45,
+        "type": "formatting",
+        "title": "linebreak",
+        "formatting": {
+          "height": 10,
+          "line": 0,
+          "nodeselected": false
+        },
+        "children": []
+      },
+      {
+        "id": 46,
+        "type": "node",
+        "title": "platforms",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 180,
+          "height": 20,
+          "fill": "#90a37a",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 930,
+          "y": 60,
+          "line": 1,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 47,
+        "type": "formatting",
+        "title": "linebreak",
+        "formatting": {
+          "height": 10,
+          "line": 1,
+          "nodeselected": false
+        },
+        "children": []
+      },
+      {
+        "id": 48,
+        "type": "node",
+        "title": "Prime time",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 180,
+          "height": 20,
+          "fill": "#edaa2b",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 930,
+          "y": 90,
+          "line": 2,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "type": "formatting",
+    "title": "linebreak",
+    "formatting": {
+      "height": 10,
+      "line": 0,
+      "nodeselected": false
+    },
+    "children": []
+  },
+  {
+    "id": 49,
+    "type": "node",
+    "title": "new entry",
+    "formatting": {
+      "strokeWidth": 0,
+      "width": 300,
+      "height": 40,
+      "showas": "rectangle",
+      "borderColor": "black",
+      "fill": "#f7f7f7",
+      "fontFamily": "Verdana, Geneva, sans-serif",
+      "fontColor": "#FFFFFF",
+      "fontSize": 10,
+      "level": 0,
+      "x": 0,
+      "y": 140,
+      "numLines": 1,
+      "heightPerLine": [
+        {
+          "line": 0,
+          "height": 0
+        }
+      ],
+      "line": 1,
+      "nodeselected": false
+    },
+    "metadata": [],
+    "children": []
+  },
+  {
+    "id": 52,
+    "type": "node",
+    "title": "",
+    "formatting": {
+      "strokeWidth": 0,
+      "width": 520,
+      "height": 100,
+      "showas": "rectangle",
+      "borderColor": "black",
+      "fill": "#f7f7f7",
+      "fontFamily": "Verdana, Geneva, sans-serif",
+      "fontColor": "#FFFFFF",
+      "fontSize": 10,
+      "level": 0,
+      "x": 310,
+      "y": 140,
+      "numLines": 3,
+      "heightPerLine": [
+        {
+          "line": 0,
+          "height": 30
+        },
+        {
+          "line": 1,
+          "height": 30
+        },
+        {
+          "line": 2,
+          "height": 0
+        }
+      ],
+      "line": 1,
+      "nodeselected": false
+    },
+    "metadata": [],
+    "children": [
+      {
+        "id": 51,
+        "type": "node",
+        "title": "F5",
+        "formatting": {
+          "strokeWidth": 1,
+          "width": 500,
+          "height": 20,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "fill": "#baafaf",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 12,
+          "level": 0,
+          "x": 320,
+          "y": 170,
+          "numLines": 2,
+          "heightPerLine": [
+            {
+              "line": 0,
+              "height": 0
+            },
+            {
+              "line": 1,
+              "height": 0
+            }
+          ],
+          "line": 0,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 56,
+        "type": "formatting",
+        "title": "linebreak",
+        "formatting": {
+          "height": 10,
+          "line": 0,
+          "nodeselected": false
+        },
+        "children": []
+      },
+      {
+        "id": 53,
+        "type": "node",
+        "title": "TAM",
+        "formatting": {
+          "strokeWidth": 1,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 500,
+          "height": 20,
+          "fill": "#baafaf",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 320,
+          "y": 200,
+          "line": 1,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 54,
+        "type": "formatting",
+        "title": "linebreak",
+        "formatting": {
+          "height": 10,
+          "line": 1,
+          "nodeselected": false
+        },
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": 50,
+    "type": "formatting",
+    "title": "linebreak",
+    "formatting": {
+      "height": 10,
+      "line": 1,
+      "nodeselected": false
+    },
+    "children": []
+  },
+  {
+    "id": 5,
+    "type": "node",
+    "title": "Weblogic",
+    "formatting": {
+      "strokeWidth": 2,
+      "showas": "rectangle",
+      "borderColor": "black",
+      "fill": "#dae4eb",
+      "fontFamily": "Verdana, Geneva, sans-serif",
+      "fontColor": "#241a1a",
+      "fontSize": 10,
+      "width": 560,
+      "height": 120,
+      "level": 0,
+      "x": 0,
+      "y": 280,
+      "numLines": 1,
+      "heightPerLine": [
+        {
+          "line": 0,
+          "height": 80
+        }
+      ],
+      "line": 2,
+      "nodeselected": false
+    },
+    "metadata": [
+      {
+        "name": "server type",
+        "value": "apple"
+      },
+      {
+        "name": "color",
+        "value": "pink"
+      }
+    ],
+    "children": [
+      {
+        "id": 36,
+        "type": "node",
+        "title": "my online app",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 80,
+          "height": 70,
+          "fill": "#B19CD8",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 10,
+          "y": 310,
+          "line": 0,
+          "nodeselected": false,
+          "numLines": 1,
+          "heightPerLine": [
+            {
+              "line": 0,
+              "height": 110
+            }
+          ]
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 57,
+        "type": "node",
+        "title": "next app",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 80,
+          "height": 70,
+          "fill": "#B19CD8",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 100,
+          "y": 310,
+          "line": 0,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 58,
+        "type": "node",
+        "title": "yet another one",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 80,
+          "height": 70,
+          "fill": "#B19CD8",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 190,
+          "y": 310,
+          "line": 0,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 59,
+        "type": "node",
+        "title": "",
+        "formatting": {
+          "strokeWidth": 0,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 40,
+          "height": 70,
+          "fill": "#dae4eb",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 280,
+          "y": 310,
+          "line": 0,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 60,
+        "type": "node",
+        "title": "Lixus",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 80,
+          "height": 70,
+          "fill": "#B19CD8",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 330,
+          "y": 310,
+          "line": 0,
+          "nodeselected": true
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 61,
+        "type": "node",
+        "title": "",
+        "formatting": {
+          "strokeWidth": 0,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 40,
+          "height": 70,
+          "fill": "#dae4eb",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 420,
+          "y": 310,
+          "line": 0,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 62,
+        "type": "node",
+        "title": "Modelare",
+        "formatting": {
+          "strokeWidth": 3,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 80,
+          "height": 70,
+          "fill": "#B19CD8",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 470,
+          "y": 310,
+          "line": 0,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "type": "node",
+    "title": "node2.2",
+    "formatting": {
+      "strokeWidth": 2,
+      "showas": "rectangle",
+      "borderColor": "black",
+      "fill": "#ffffff",
+      "fontFamily": "Verdana, Geneva, sans-serif",
+      "fontColor": "#000000",
+      "fontSize": 19,
+      "width": 560,
+      "height": 260,
+      "level": 0,
+      "x": 570,
+      "y": 280,
+      "line": 2,
+      "nodeselected": false,
+      "numLines": 2,
+      "heightPerLine": [
+        {
+          "line": 0,
+          "height": 110
+        },
+        {
+          "line": 1,
+          "height": 110
         }
       ]
-    }]},
-    {"envId": 2, "envName": "test2", "nodes": []}]
-    
-    
+    },
+    "metadata": [
+      {
+        "name": "server type",
+        "value": "microsoft"
+      },
+      {
+        "name": "color",
+        "value": "black"
+      }
+    ],
+    "children": [
+      {
+        "id": 8,
+        "type": "node",
+        "title": "node2.2.1",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 100,
+          "height": 100,
+          "fill": "#B19CD8",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 580,
+          "y": 310,
+          "line": 0,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 9,
+        "type": "node",
+        "title": "node2.2.2",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 100,
+          "height": 100,
+          "fill": "#B19CD8",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 690,
+          "y": 310,
+          "line": 0,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 10,
+        "type": "node",
+        "title": "node2.2.3",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 100,
+          "height": 100,
+          "fill": "#B19CD8",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 800,
+          "y": 310,
+          "line": 0,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 11,
+        "type": "node",
+        "title": "node2.2.4",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 100,
+          "height": 100,
+          "fill": "#B19CD8",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 910,
+          "y": 310,
+          "line": 0,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 12,
+        "type": "node",
+        "title": "node2.2.5",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 100,
+          "height": 100,
+          "fill": "#B19CD8",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 1020,
+          "y": 310,
+          "line": 0,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 4,
+        "type": "formatting",
+        "title": "linebreak",
+        "formatting": {
+          "height": 10,
+          "line": 0,
+          "nodeselected": false
+        },
+        "children": []
+      },
+      {
+        "id": 13,
+        "type": "node",
+        "title": "node2.2.6",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 100,
+          "height": 100,
+          "fill": "#B19CD8",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 580,
+          "y": 420,
+          "line": 1,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 14,
+        "type": "node",
+        "title": "node2.2.7",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 100,
+          "height": 100,
+          "fill": "#B19CD8",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 690,
+          "y": 420,
+          "line": 1,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 15,
+        "type": "node",
+        "title": "node2.2.8",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 100,
+          "height": 100,
+          "fill": "#B19CD8",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 800,
+          "y": 420,
+          "line": 1,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 17,
+        "type": "node",
+        "title": "node2.2.10",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 100,
+          "height": 100,
+          "fill": "#B19CD8",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 910,
+          "y": 420,
+          "line": 1,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 19,
+        "type": "node",
+        "title": "node2.2.12",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 100,
+          "height": 100,
+          "fill": "#B19CD8",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 1020,
+          "y": 420,
+          "line": 1,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      }
+    ]
+  }
+]},
+{ "envId": 2, "envName": "name2", "maxId": 6, "nodes": []}]

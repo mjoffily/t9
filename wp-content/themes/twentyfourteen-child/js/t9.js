@@ -46,3 +46,35 @@ app.filter('title', function() {
         return filtered;
     };
 });
+
+// app.filter('name', function() {
+//     return function(items, title) {
+//         var filteredNodes = [];
+//         angular.forEach(items, function(item) {
+//             var metadataFiltered = [];
+//             angular.forEach(metadataList, function(metadata) {
+//                 if (metadata.name.toLowerCase().indexOf(name.toLowerCase()) >= 0) {
+//                     metadatafiltered.push(metadata);
+//                 }
+//             });
+//             if (metadataFiltered.length > 0) {
+                
+//                 filteredNodes.push()
+//             }
+            
+//         });
+//         return filtered;
+//     };
+// });
+
+app.filter('value', function() {
+    return function(items, title) {
+        var filtered = [];
+        angular.forEach(items, function(item) {
+            if (item.title.toLowerCase().indexOf(title.toLowerCase()) >= 0) {
+                filtered.push(item);
+            }
+        });
+        return filtered;
+    };
+});

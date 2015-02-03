@@ -1,4 +1,4 @@
-app.controller('flatViewCtrl', ['$scope', '$stateParams', 'titleFilter', function($scope, $stateParams, titleFilter) {
+app.controller('flatViewCtrl', ['$scope', '$stateParams', 'titleFilter', 'valueFilter', function($scope, $stateParams, titleFilter, valueFilter) {
 	$scope.searchname = "";
 	$scope.searchvalue = "";
 	$scope.searchtitle = "";
@@ -29,7 +29,8 @@ app.controller('flatViewCtrl', ['$scope', '$stateParams', 'titleFilter', functio
 
 	$scope.filter = function() {
 		$scope.filterednodes = titleFilter($scope.flatnodes, $scope.searchtitle);
-		
+//		$scope.filterednodes = nameFilter($scope.filterednodes, $scope.searchname);
+		$scope.filterednodes = valueFilter($scope.filterednodes, $scope.searchvalue);
 	}
 	
 	$scope.columns = function() {

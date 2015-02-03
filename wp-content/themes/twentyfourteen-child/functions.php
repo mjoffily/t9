@@ -13,8 +13,6 @@ function t9_scripts() {
     'theme_directory' => get_stylesheet_directory_uri()
     );
 
-	wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css' );
-    wp_enqueue_style( 'child-style', get_stylesheet_uri(), array( 'parent-style' ) );
 	
 	
 	// styles for t9 app
@@ -25,6 +23,7 @@ function t9_scripts() {
 	wp_enqueue_style( 'ngDialog', get_stylesheet_directory_uri() . '/css/ngDialog.css');
 	wp_enqueue_style( 'ngDialogTheme', get_stylesheet_directory_uri() . '/css/ngDialog-theme-default.css');
 	wp_enqueue_style( 'xeditable', get_stylesheet_directory_uri() . '/css/xeditable.css');
+    wp_enqueue_style( 'child-style', get_stylesheet_uri(), array( 'parent-style' ) );
 
     wp_enqueue_script( 'angular-script', get_stylesheet_directory_uri() . '/js/_lib/angular.js');
     wp_enqueue_script( 'angularUi-script', get_stylesheet_directory_uri() . '/js/_lib/angular-ui-tree.js');
@@ -33,13 +32,15 @@ function t9_scripts() {
     wp_enqueue_script( 'colorpicker-script', get_stylesheet_directory_uri() . '/js/_lib/bootstrap-colorpicker-module.min.js');
     wp_enqueue_script( 'ngDialog-script', get_stylesheet_directory_uri() . '/js/_lib/ngDialog.js');
     wp_enqueue_script( 'xeditable-script', get_stylesheet_directory_uri() . '/js/_lib/xeditable.js');
+    wp_enqueue_script( 'd3-script', get_stylesheet_directory_uri() . '/js/_lib/d3.js');
     wp_enqueue_script( 't9-script', get_stylesheet_directory_uri() . '/js/t9.js');
     wp_enqueue_script( 'services-script', get_stylesheet_directory_uri() . '/js/services/services.js');
-    wp_enqueue_script( 'diagram-controller-script', get_stylesheet_directory_uri() . '/js/controller/DiagramCtrl.js');
+    wp_enqueue_script( 'diagram-controller-script', get_stylesheet_directory_uri() . '/js/controller/DiagramD3Ctrl.js');
     wp_enqueue_script( 'file-controller-script', get_stylesheet_directory_uri() . '/js/controller/FileCtrl.js');
     wp_enqueue_script( 'main-controller-script', get_stylesheet_directory_uri() . '/js/controller/MainCtrl.js');
     wp_enqueue_script( 'flat-view-controller-script', get_stylesheet_directory_uri() . '/js/controller/FlatViewCtrl.js');
     wp_enqueue_script( 'directives-script', get_stylesheet_directory_uri() . '/js/directives/directives.js');
+    
     wp_localize_script( 't9-script', 'SiteParameters', $site_parameters );
 
 }
