@@ -1,0 +1,191 @@
+[{ "envId": 1, "envName": "name1", "maxId": 65, "nodes": [{
+    "id": 7,
+    "type": "node",
+    "title": "eCommerce Physical View",
+    "formatting": {
+      "strokeWidth": 0,
+      "width": 660,
+      "height": 80,
+      "showas": "rectangle",
+      "borderColor": "black",
+      "fill": "#aeadb8",
+      "fontFamily": "Verdana, Geneva, sans-serif",
+      "fontColor": "#292121",
+      "fontSize": 27,
+      "level": 0,
+      "x": 0,
+      "y": 0,
+      "numLines": 1,
+      "heightPerLine": [
+        {
+          "line": 0,
+          "height": 0
+        }
+      ],
+      "line": 0,
+      "nodeselected": false
+    },
+    "metadata": [],
+    "children": []
+  },
+  {
+    "id": 43,
+    "type": "node",
+    "title": "TITLE",
+    "formatting": {
+      "strokeWidth": 0,
+      "width": 240,
+      "height": 100,
+      "showas": "rectangle",
+      "borderColor": "black",
+      "fill": "#aeadb8",
+      "fontFamily": "Verdana, Geneva, sans-serif",
+      "fontColor": "#ffffff",
+      "fontSize": 10,
+      "level": 0,
+      "x": 670,
+      "y": 0,
+      "numLines": 1,
+      "heightPerLine": [
+        {
+          "line": 0,
+          "height": 0
+        }
+      ],
+      "line": 0,
+      "nodeselected": false
+    },
+    "metadata": [],
+    "children": []
+  },
+  {
+    "id": 42,
+    "type": "node",
+    "title": "",
+    "formatting": {
+      "strokeWidth": 0,
+      "width": 200,
+      "height": 130,
+      "showas": "rectangle",
+      "borderColor": "black",
+      "fill": "#aeadb8",
+      "fontFamily": "Verdana, Geneva, sans-serif",
+      "fontColor": "#FFFFFF",
+      "fontSize": 10,
+      "level": 0,
+      "x": 920,
+      "y": 0,
+      "numLines": 3,
+      "heightPerLine": [
+        {
+          "line": 0,
+          "height": 30
+        },
+        {
+          "line": 1,
+          "height": 30
+        },
+        {
+          "line": 2,
+          "height": 30
+        }
+      ],
+      "line": 0,
+      "nodeselected": false
+    },
+    "metadata": [],
+    "children": [
+      {
+        "id": 44,
+        "type": "node",
+        "title": "Separately managed resource",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 180,
+          "height": 20,
+          "fill": "#aeadb8",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 930,
+          "y": 30,
+          "line": 0,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 45,
+        "type": "formatting",
+        "title": "linebreak",
+        "formatting": {
+          "height": 10,
+          "line": 0,
+          "nodeselected": false
+        },
+        "children": []
+      },
+      {
+        "id": 46,
+        "type": "node",
+        "title": "platforms",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 180,
+          "height": 20,
+          "fill": "#90a37a",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 930,
+          "y": 60,
+          "line": 1,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      },
+      {
+        "id": 47,
+        "type": "formatting",
+        "title": "linebreak",
+        "formatting": {
+          "height": 10,
+          "line": 1,
+          "nodeselected": false
+        },
+        "children": []
+      },
+      {
+        "id": 48,
+        "type": "node",
+        "title": "Prime time",
+        "formatting": {
+          "strokeWidth": 2,
+          "showas": "rectangle",
+          "borderColor": "black",
+          "width": 180,
+          "height": 20,
+          "fill": "#edaa2b",
+          "fontFamily": "Verdana, Geneva, sans-serif",
+          "fontColor": "#FFFFFF",
+          "fontSize": 10,
+          "level": 1,
+          "x": 930,
+          "y": 90,
+          "line": 2,
+          "nodeselected": false
+        },
+        "metadata": [],
+        "children": []
+      }
+    ]
+  }
+]}]
