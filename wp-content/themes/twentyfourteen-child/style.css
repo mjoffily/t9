@@ -131,8 +131,8 @@ nice, td {
 
 #nodepropertiesdiv {
  position:absolute;
- top:150;
- right:0;
+ top:550px;
+ right:0px;
  width:500px;
 }
 
@@ -242,3 +242,18 @@ nice, td {
   border-right: none;
 }
 
+.somethingontheright {
+    stroke-width: 3;
+    fill: grey;
+    stroke: brown;
+}
+.somethingontheleft {
+    stroke-width: 3;
+    fill: grey;
+    stroke: pink;
+}
+
+.groupclass {
+    stroke: orange;
+    fill: grey;
+}

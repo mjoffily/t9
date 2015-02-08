@@ -11,14 +11,11 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 	$scope.topPadding = 30;
 	$scope.editorEnabled = false;
 	$scope.showJson = false;
+	$scope.showOutline = false;
 	$scope.propertiesTemplate = SiteParameters.theme_directory + '/js/partials/popup.html';
 	$scope.shapes = ['rectangle', 'circle', 'triangle', 'elipse'];
 	$scope.holder = []; // holdings list of overlapping objects during drag event
-	$scope.drag = d3.behavior.drag()
-		.origin(Object)
-		.on("dragstart", $scope.dragstart)
-		.on("dragend", $scope.dragend)
-		.on("drag", $scope.dragmove);
+	$scope.draggingInProgress = false; // flag to prevent redrawing when draggring is in progress
 
 
 	$scope.referencesPerLevel = [];
@@ -105,6 +102,11 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 		$scope.showJson = !$scope.showJson;
 	}
 
+	$scope.toggleOutline = function() {
+		$scope.showOutline = !$scope.showOutline;
+		$scope.draw();
+	}
+
 	$scope.moveLastToTheBeginning = function() {
 		var a = $scope.file.pop();
 		$scope.file.splice(0, 0, a);
@@ -112,9 +114,6 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 
 
 	$scope.draw = function draw() {
-		// clear the canvas
-		d3.selectAll("svg > *").remove();
-
 		// calculate the width and height and x coordinate for all elements
 		for (var i = 0; i < $scope.file.length; i++) {
 			var elem = $scope.file[i];
@@ -145,98 +144,240 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 			});
 		}
 
-		$scope.render($scope.file, 0);
+		$scope.render();
 	};
 
-	$scope.render = function(file, level) {
-		var g = d3.select("svg").append("g");
-		var rectangles = g.selectAll(".rectlvl" + level).data(file).enter().append("rect");
-		rectangles
-			.attr("x", function(d, i) {
-				return d.formatting.x;
-			})
-			.attr("y", function(d, i) {
-				return d.formatting.y
-			})
-			.attr("height", function(d, i) {
-				return d.formatting.height;
-			})
-			.attr("width", function(d, i) {
-				return d.formatting.width;
-			})
-			.style("fill", function(d, i) {
-				return d.formatting.fill;
-			})
-			.style("stroke-width", function(d, i) {
-				return d.formatting.strokeWidth;
-			})
-			.style("stroke", function(d, i) {
-				return d.formatting.borderColor;
-			})
-			.style("class", ".rectlvl" + level)
-			.on("click", function(d, index) {
-				d.formatting.nodeselected = true;
-				$scope.findNode(d.id, $scope.file);
-			})
-			.on("mouseover", function(d) {
-				d3.select(this).style("stroke", "pink").style("strokeWidth", 4);
-			})
-			.on("mouseout", function(d) {
-				if (!d.formatting.nodeselected) {
-					d3.select(this).style("stroke", d.formatting.borderColor).style("strokeWidth", d.formatting.strokeWidth);
-				}
-			});
+	$scope.dragstart = function(d) {
+		// flag to avoid redrawing while dragging is in progress
+		$scope.draggingInProgress = true;
+		d.formatting.originalx = d.formatting.x;
+		d.formatting.originaly = d.formatting.y;
+		// initialise the holder of overlapping objects
+		$scope.holder = [];
+	}
 
-		var text = g.selectAll(".textlvl" + level).data(file).enter().append("text");
-		text.text(function(d) {
-				if (d.type !== 'formatting') {
-					return d.title;
+	/**
+	 * Find and remove the object being dragged from its current location in the tree. 
+	 * To do that, locate the parent of the object and remove it from its children array
+	 */
+	$scope.removeDraggedObjectFromCurrentLocation = function(d) {
+		var parent = $scope.flatIndexedNodesForSelectedFile[d.id].parent;
+		if (parent) {
+			for (var i = 0; i < parent.children.length; i++) {
+				if (parent.children[i].id === d.id) { // we found the object being dragged
+					parent.children.splice(i, 1); // remove the node from the parent array
+					break;
 				}
-				else {
-					return '';
+			}
+		} else { // no parent. Must be a top level node
+			for (var i = 0; i < $scope.file.length; i++) {
+				if ($scope.file[i].id === d.id) { // we found the object being dragged in the tree array
+					$scope.file.splice(i, 1); // remove the node from the tree (top level)
+					break;
 				}
-			})
-			.attr("x", function(d) {
-				if (d.type !== 'formatting') {
-					return d.formatting.x + (d.formatting.width / 2);
-				}
-				else {
-					return 0;
-				}
-			})
-			.attr("y", function(d) {
-				if (d.type !== 'formatting') {
-					if (d.children.length > 0) {
-						return d.formatting.y + $scope.textPadding
-					}
-					else {
-						return d.formatting.y + (d.formatting.height / 2);
-					}
-				}
-				else {
-					return 0;
-				}
-			})
-			.attr("fill", function(d) {
-				return d.formatting.fontColor
-			})
-			.attr("font-family", function(d) {
-				return d.formatting.fontFamily
-			})
-			.attr("font-size", function(d) {
-				return d.formatting.fontSize
-			})
-			.attr("text-anchor", "middle");
-
-		level = level + 1;
-
-		for (var i = 0; i < file.length; i++) {
-			var currentNode = file[i];
-			if (currentNode.children.length > 0) {
-				$scope.render(currentNode.children, level);
 			}
 		}
+	}
 
+	$scope.moveDraggedObjectNextToOverlapingNode = function(d, overlapingNode) {
+		// Find parent of overlping node
+		var parent = $scope.flatIndexedNodesForSelectedFile[overlapingNode.id].parent;
+		// if it has a parent, find the position of the overlaping node in the children array.
+		if (parent) {
+			for (var i = 0; i < parent.children.length; i++) {
+				if (parent.children[i].id === overlapingNode.id) { // we found the overlaping node
+					parent.children.splice(i+1, 0, d); // add the dragged object as a sibiling
+					// TODO - recurse children setting correct level
+					d.formatting.level = parent.formatting.level + 1;
+					$scope.flatIndexedNodesForSelectedFile[d.id].parent = parent;
+					break;
+				}
+			}
+			// update the parent reference in the flat node structure
+			$scope.flatIndexedNodesForSelectedFile[d.id].parent = parent;
+		} else { // it is a top level element
+			for (var i = 0; i < $scope.file.length; i++) {
+				if ($scope.file[i].id === overlapingNode.id) { // we found the object being dragged in the tree array
+					$scope.file.splice(i+1, 0, d); // insert the node as sibiling of the overlaping node at the top of the tree (no parent)
+					d.formatting.level = 0; // set it to level zero on the tree (top)
+					$scope.flatIndexedNodesForSelectedFile[d.id].parent = undefined; // no parent for it
+					break;
+				}
+			}
+		}
+		// update the node's level in the tree to be the same as the overlaping node
+		d.formatting.level = overlapingNode.formatting.level;
+	};
+
+	$scope.moveDraggedObjectAsChildOfOverlapingNode = function(d, overlapingNode) {
+		$scope.flatIndexedNodesForSelectedFile[overlapingNode.id].node.children.push(d);
+		$scope.flatIndexedNodesForSelectedFile[d.id].parent = overlapingNode;
+		d.formatting.level = overlapingNode.formatting.level + 1;
+		// TODO implement this function
+		//$scope.updateLevel(d, overlapingNode.formatting.level);
+	};
+	
+	$scope.dragend = function(d) {
+		var group = d3.select(this);
+		console.log('HOLDER END: ' + $scope.holder);
+		// if we end the drag without overlapping with any other objects, we "cancel" the drag
+		// by returning the object to its original position
+		var dragOverlapAny = ($scope.holder.length > 0);
+		if (!dragOverlapAny) {
+			d.formatting.x = d.formatting.originalx;
+			d.formatting.y = d.formatting.originaly;
+			group.attr("transform", "translate(" + d.formatting.x + "," + d.formatting.y + ")");
+			$scope.draggingInProgress = false;
+			return;
+		}
+	
+		// scenario 1 - dragged object overlaps with a single object touching it from the right hand side
+		//            --> object will be dragged as sibiling 
+		if ($scope.holder.length === 1) {
+			$scope.removeDraggedObjectFromCurrentLocation(d);
+			if (d3.event.sourceEvent.shiftKey) { // shiftkey pressed
+				// lets move the node to be a child of the overlaping node
+				$scope.moveDraggedObjectAsChildOfOverlapingNode(d, $scope.holder[0]);
+			} else {
+				// now, lets move the node to be a sibiling of the overlaping node.
+				$scope.moveDraggedObjectNextToOverlapingNode(d, $scope.holder[0]);
+			}
+			
+			$scope.draw();
+			
+			
+		} else if ($scope.holder.length === 2) {
+	      // scenario 2 - dragged object overlaps with two objects. Priority will be given to the one at a deeper level of the tree
+	      //              as it is easy for the user to overlap only with a parent object. When it overlaps with the child, it must go
+	      //              over the parent and therefore the number of overlaping objects is two.
+	      //              if both overlaping objects are at the same level we will pick an arbitrary one
+			
+		} else if ($scope.holder.length === 3) {
+			
+		}
+			
+		$scope.draggingInProgress = false;
+	}
+
+
+
+
+	$scope.dragmove = function(d) {
+		// initialise list of overlapping objects
+		$scope.holder = [];
+		d.formatting.x += d3.event.dx;
+		d.formatting.y += d3.event.dy;
+		var group = d3.select(this);
+		group.attr("transform", "translate(" + d.formatting.x + "," + d.formatting.y + ")");
+		$scope.findDragOver($scope.flatNodesForSelectedFile, d.formatting.x, d.formatting.y, true, $scope.holder, d);
+	}
+
+	$scope.dragGroup = d3.behavior.drag()
+		.origin(Object)
+		.on("dragstart", $scope.dragstart)
+		.on("dragend", $scope.dragend)
+		.on("drag", $scope.dragmove);
+
+	$scope.render = function() {
+
+		// sort the data so objects are drawn in the correct order
+
+		var g = d3.select("svg").selectAll("g").data($scope.flatNodesForSelectedFile, function(d) {
+				return d.id;
+			}).sort(function(a, b){
+			if (a.formatting.level === b.formatting.level) {
+				return 0;
+			} else if (a.formatting.level > b.formatting.level) {
+				return 1;
+			} else {
+				return -1;
+			}
+		});
+			
+		var gEnter = g.enter()
+		.append('g')
+		.attr("id", function(d) {
+			return "group_" + d.id
+		})
+		.attr("class", "groupclass")
+		//.call($scope.dragGroup);
+		
+		gEnter.append("rect");
+		gEnter.append("text");
+					
+			
+	    g.attr("transform", function(d) {
+			return "translate(" + [d.formatting.x, d.formatting.y] + ")";
+		})
+		.on('click', function(d, i) { $scope.findNode(d.id)});
+
+
+		g.selectAll("rect")
+		.attr("id", function(d) {
+			return 'rect_' + d.id
+		})
+		.attr("height", function(d, i) {
+			return d.formatting.height;
+		})
+		.attr("width", function(d, i) {
+			return d.formatting.width;
+		})
+		.style("fill", function(d, i) {
+			return d.formatting.fill;
+		})
+		.style("stroke-width", function(d, i) {
+			return $scope.showOutline ? 1 : d.formatting.strokeWidth;
+		})
+		.style("stroke", function(d, i) {
+			return $scope.showOutline ? 'black' : d.formatting.borderColor;
+		})
+		.style("class", ".rectlvl");
+
+		g.selectAll("text").attr("id", function(d) {
+			return 'text_' + d.id
+		})
+		.text(function(d) {
+			if (d.type !== 'formatting') {
+				return d.title;
+			}
+			else {
+				return '';
+			}
+		})
+		.attr("x", function(d) {
+			if (d.type !== 'formatting') {
+				return (d.formatting.width / 2);
+			}
+			else {
+				return 0;
+			}
+		})
+		.attr("y", function(d) {
+			if (d.type !== 'formatting') {
+				if (d.children.length > 0) {
+					return $scope.textPadding
+				}
+				else {
+					return (d.formatting.height / 2);
+				}
+			}
+			else {
+				return 0;
+			}
+		})
+		.attr("fill", function(d) {
+			return d.formatting.fontColor
+		})
+		.attr("font-family", function(d) {
+			return d.formatting.fontFamily
+		})
+		.attr("font-size", function(d) {
+			return d.formatting.fontSize
+		})
+		.attr("text-anchor", "middle");
+		g.call($scope.dragGroup);
+
+		g.exit().remove();
 	};
 
 	$scope.setTopLevelY = function(elem, siblings, elemIndex, line) {
@@ -477,108 +618,12 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 	};
 
 
-	$scope.findDragOver = function(objArr, mousex, mousey, highlight, holder, idOfObjBeingDragged) {
-		for (var i = 0; i < objArr.length; i++) {
-			var obj = objArr[i];
-
-			if (obj.id !== idOfObjBeingDragged) {
-				console.log('mousex: ' + mousex + ' mousey: ' + mousey + ' objx: ' + obj.x + ' obj-width: ' + obj.w + ' objy: ' + obj.y + ' obj-bottom: ' + obj.h);
-				if (mousex >= obj.x && mousex <= (Number(obj.x) + Number(obj.w))) {
-					if (mousey >= obj.y && mousey <= (Number(obj.y) + Number(obj.h))) {
-						// Yes, the mouse is on a droppable area
-						// Lets change the background color
-						console.log('yes - found id ' + obj.id);
-						holder.push(obj);
-
-						if (highlight) {
-							d3.select("#id" + obj.id).classed("somethingover", true)
-						}
-					}
-					else {
-						// Nope, we did not hit any objects yet
-						if (highlight) {
-							d3.select("#id" + obj.id).classed("somethingover", false)
-						}
-						console.log('nope, no match for id ' + obj.id);
-					}
-				}
-				else {
-					// Nope, we did not hit any objects yet
-					if (highlight) {
-						d3.select("#id" + obj.id).classed("somethingover", false)
-					}
-					console.log('nope, no match for id ' + obj.id);
-
-				}
-			}
-			if (obj.children.length > 0) {
-				$scope.findDragOver(obj.children, mousex, mousey, highlight, holder, idOfObjBeingDragged)
-			}
-		}
-	}
-
-
-	$scope.dragstart = function(d) {
-		d.originalx = d.x;
-		d.originaly = d.y;
-		// initialise the holder of overlapping objects
-		$scope.holder = [];
-	}
-
-	$scope.dragend = function(d) {
-		var obj = d3.select(this);
-		console.log('HOLDER END: ' + $scope.holder);
-		// if we end the drag without overlapping with any other objects, we "cancel" the drag
-		// by returning the object to its original position
-		if ($scope.holder.length === 0) {
-			d.x = d.originalx;
-			d.y = d.originaly;
-			obj.attr("x", d.x);
-			obj.attr("y", d.y);
-		}
-	}
-
-
-
-
-	$scope.dragmove = function(d) {
-		// initialise list of overlapping objects
-		$scope.holder = [];
-		var obj = d3.select(this);
-		d.x = d3.event.x;
-		d.y = d3.event.y;
-		obj.attr("x", d.x);
-		obj.attr("y", d.y);
-		$scope.findDragOver($scope.file, d3.event.x, d3.event.y, true, $scope.holder, d.id);
-		console.log('HOLDER: ' + $scope.holder);
-	}
-
-
 	$scope.$watch("file", function(newValue, oldValue) {
-		$scope.draw();
+		if (!$scope.draggingInProgress) {
+			$scope.draw();
+		}
 	}, true);
 
-	$scope.shadeBlend = function(p, c0, c1) {
-		var n = p < 0 ? p * -1 : p,
-			u = Math.round,
-			w = parseInt;
-		if (c0.length > 7) {
-			var f = c0.split(","),
-				t = (c1 ? c1 : p < 0 ? "rgb(0,0,0)" : "rgb(255,255,255)").split(","),
-				R = w(f[0].slice(4)),
-				G = w(f[1]),
-				B = w(f[2]);
-			return "rgb(" + (u((w(t[0].slice(4)) - R) * n) + R) + "," + (u((w(t[1]) - G) * n) + G) + "," + (u((w(t[2]) - B) * n) + B) + ")"
-		}
-		else {
-			var f = w(c0.slice(1), 16),
-				t = w((c1 ? c1 : p < 0 ? "#000000" : "#FFFFFF").slice(1), 16),
-				R1 = f >> 16,
-				G1 = f >> 8 & 0x00FF,
-				B1 = f & 0x0000FF;
-			return "#" + (0x1000000 + (u(((t >> 16) - R1) * n) + R1) * 0x10000 + (u(((t >> 8 & 0x00FF) - G1) * n) + G1) * 0x100 + (u(((t & 0x0000FF) - B1) * n) + B1)).toString(16).slice(1)
-		}
-	};
 	$scope.applyChanges = function() {
 		$scope.draw();
 	}
@@ -612,5 +657,130 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 	$scope.makeStrokeThinner = function() {
 		$scope.currentNode.formatting.strokeWidth = $scope.currentNode.formatting.strokeWidth - 1;
 	}
+
+	$scope.isOverlapingOnTheRight = function(mousex, mousey, target, objBeingDragged) {
+		var t_x = Number(target.formatting.x);
+		var t_y = Number(target.formatting.y);
+		var t_w = Number(target.formatting.width);
+		var t_h = Number(target.formatting.height);
+		var drag_y = Number(objBeingDragged.formatting.y);
+		var drag_h = Number(objBeingDragged.formatting.height);
+		if (target.title === 'node2.2.6') {
+			console.log(mousex, mousey, t_x, t_y, t_w, t_h, drag_y, drag_h);
+			
+		}
+		if (mousex >= t_x && mousex <= (t_x + t_w)) {
+			if (mousey >= t_y && mousey <= (t_y + t_h)) {
+				return true;
+			}
+			else if ((mousey + drag_h) > t_y && drag_y < (t_y + t_h)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	$scope.isOverlapingOnTheLeft = function(mousex, mousey, target, objBeingDragged) {
+		var t_x = Number(target.formatting.x);
+		var t_y = Number(target.formatting.y);
+		var t_w = Number(target.formatting.width);
+		var t_h = Number(target.formatting.height);
+		var drag_y = Number(objBeingDragged.formatting.y);
+		var drag_h = Number(objBeingDragged.formatting.height);
+		var drag_w = Number(objBeingDragged.formatting.width);
+
+		if (mousex + drag_w >= t_x && mousex <= (t_x)) {
+			if (mousey >= t_y && mousey <= (t_y + t_h)) {
+				return true;
+			}
+			else if ((mousey + drag_h) > t_y && drag_y < (t_y + t_h)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	$scope.targetIsParent = function(targetId, objBeingDraggedId) {
+		if ($scope.flatIndexedNodesForSelectedFile[objBeingDraggedId].parent === undefined) {
+			return false;
+		}
+		
+		return (targetId === $scope.flatIndexedNodesForSelectedFile[objBeingDraggedId].parent.id);
+	}
+	
+	$scope.findDragOver = function(objArr, mousex, mousey, highlight, holder, objBeingDragged) {
+		for (var i = 0; i < objArr.length; i++) {
+			var target = objArr[i];
+
+			if (target.id !== objBeingDragged.id && !$scope.targetIsParent(target.id,  objBeingDragged.id)) {
+				var overlapingRight = $scope.isOverlapingOnTheRight(mousex, mousey, target, objBeingDragged);
+				var overlapingLeft = $scope.isOverlapingOnTheLeft(mousex, mousey, target, objBeingDragged);
+				var group = d3.select("#group_" + target.id);
+console.log(overlapingLeft, overlapingRight);
+				//var overlapingWithShiftKey = isOverlapingWithShiftKey(mousex, mousey, obj)
+				if (overlapingRight || overlapingLeft) {
+					// Yes, the mouse is over another rectangle. 
+					holder.push(target);
+					console.log('found ' + target.title);
+
+					if (highlight) {
+						// lets highligth it
+						var classx = overlapingRight ? "somethingontheright" : "somethingontheleft";
+						group.classed(classx, true);
+						group.classed("groupclass", false);
+						group.style("stroke-width", 2)
+						.style("stroke", "pink");
+					}
+				}
+				else {
+					// Nope, we did not hit any objects yet
+					if (highlight) {
+						// remove highlighting
+						group.style("stroke-width", function(d, i) {
+							return target.formatting.strokeWidth;
+						})
+						.style("stroke", function(d, i) {
+							return target.formatting.borderColor;
+						});
+						
+						group.classed("somethingontheright", false);
+						group.classed("somethingontheleft", false);
+						group.classed("groupclass", true);
+					}
+				}
+			}
+		}
+		
+		// there is a scenario where a child object is dragged outside of its parent
+		// without touching any other objects. The purpose here is to move the object
+		// to the top of the tree. In this case, we se the target as the last node in the top
+		// level of the tree so this one is moved next to it at the top
+		if (holder.length == 0 && objBeingDragged.formatting.level > 0) {
+			holder.push($scope.file[$scope.file.length - 1]);
+		}
+
+	}
+	
+	$scope.shadeBlend = function(p, c0, c1) {
+		var n = p < 0 ? p * -1 : p,
+			u = Math.round,
+			w = parseInt;
+		if (c0.length > 7) {
+			var f = c0.split(","),
+				t = (c1 ? c1 : p < 0 ? "rgb(0,0,0)" : "rgb(255,255,255)").split(","),
+				R = w(f[0].slice(4)),
+				G = w(f[1]),
+				B = w(f[2]);
+			return "rgb(" + (u((w(t[0].slice(4)) - R) * n) + R) + "," + (u((w(t[1]) - G) * n) + G) + "," + (u((w(t[2]) - B) * n) + B) + ")"
+		}
+		else {
+			var f = w(c0.slice(1), 16),
+				t = w((c1 ? c1 : p < 0 ? "#000000" : "#FFFFFF").slice(1), 16),
+				R1 = f >> 16,
+				G1 = f >> 8 & 0x00FF,
+				B1 = f & 0x0000FF;
+			return "#" + (0x1000000 + (u(((t >> 16) - R1) * n) + R1) * 0x10000 + (u(((t >> 8 & 0x00FF) - G1) * n) + G1) * 0x100 + (u(((t & 0x0000FF) - B1) * n) + B1)).toString(16).slice(1)
+		}
+	};
 
 }]);

@@ -1,4 +1,4 @@
-[{ "envId": 1, "envName": "name1", "maxId": 6, "nodes": [{
+[{ "envId": 1, "envName": "name1", "maxId": 65, "nodes": [{
     "id": 7,
     "type": "node",
     "title": "eCommerce Physical View",
