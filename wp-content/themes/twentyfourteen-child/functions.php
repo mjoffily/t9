@@ -40,6 +40,7 @@ function t9_scripts() {
     wp_enqueue_script( 'main-controller-script', get_stylesheet_directory_uri() . '/js/controller/MainCtrl.js');
     wp_enqueue_script( 'flat-view-controller-script', get_stylesheet_directory_uri() . '/js/controller/FlatViewCtrl.js');
     wp_enqueue_script( 'directives-script', get_stylesheet_directory_uri() . '/js/directives/directives.js');
+    wp_enqueue_script( 'node-properties-directive-script', get_stylesheet_directory_uri() . '/js/directives/node-properties.js');
     
     wp_localize_script( 't9-script', 'SiteParameters', $site_parameters );
 
