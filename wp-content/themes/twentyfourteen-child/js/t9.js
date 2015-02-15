@@ -1,6 +1,10 @@
 'use strict';
 
-var app = angular.module('treeApp', ['ui.tree', 'colorpicker.module', 'ngDialog', 'xeditable', 'ui.router']);
+var app = angular.module('treeApp', ['ui.tree', 'colorpicker.module', 'ngDialog', 'xeditable', 'ui.router', 'ui.bootstrap']);
+
+app.run(function($rootScope, $state) {
+    $rootScope.$state = $state;    
+});
 
 app.config(function($stateProvider, $urlRouterProvider, $locationProvider) {
         $locationProvider.html5Mode(true);

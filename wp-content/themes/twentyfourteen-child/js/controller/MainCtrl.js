@@ -56,12 +56,12 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 		for (var j = 0; j < sourceArray.length; j++) {
 			var node = sourceArray[j];
 			destinationArray.flatindexedNodes[node.id] = {node: node, parent: parent};
-			if (node.type === 'node') {
+//			if (node.type === 'node') {
 				destinationArray.flatnodes.push(node);
 				if (node.children.length > 0) {
 					$scope.flattenNodes(destinationArray, node.children, node);
 				}
-			}
+//			}
 		}
 	}
 
@@ -147,31 +147,99 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 		$scope.data[$scope.selectedFileIndex].nodes.splice(0, 0, a);
 		$scope.dataflat[$scope.selectedFileIndex].flatnodes.push(a);
 		$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[a.id] = {node: a, parent: undefined};
+		$scope.findNode(a.id);
 	};
 
-	$scope.addNewLineBreak = function() {
+	$scope.deleteNode = function() {
+		$scope.delete($scope.currentNode.id, $scope.data[$scope.selectedFileIndex].nodes);
+	}
+	
+	$scope.delete = function(id, arr) {
+		for (var i = 0; i < arr.length; i++) { // delete from tree array and from flat and flat indexed arrays too
+			if (arr[i].id === id) {
+				$scope.deleteChildren(arr[i].children);
+				for (var j = 0; j < $scope.dataflat[$scope.selectedFileIndex].flatnodes.length; j++) {
+					if ($scope.dataflat[$scope.selectedFileIndex].flatnodes[j].id === arr[i].id) {
+						$scope.dataflat[$scope.selectedFileIndex].flatnodes.splice(j, 1);
+						break;
+					}
+				}
+				
+				$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[arr[i].id] = {};
+				arr.splice(i, 1);
+				break;
+			} else if (arr[i].children.length > 0) {
+				$scope.delete(id, arr[i].children);
+			}
+		}
+	}
+	
+	$scope.deleteChildren = function(arr) {
+		for (var i = 0; i < arr.length; i++) { 
+			if (arr[i].children.length > 0) {
+				$scope.deleteChildren(arr[i].children);
+			} else {
+				for (var j = 0; j < $scope.dataflat[$scope.selectedFileIndex].flatnodes.length; j++) {
+					if ($scope.dataflat[$scope.selectedFileIndex].flatnodes[j].id === arr[i].id) {
+						$scope.dataflat[$scope.selectedFileIndex].flatnodes.splice(j, 1);
+						break;
+					}
+				}
+				$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[arr[i].id] = {};
+			}
+		}
+	}
+
+	$scope.getParent = function(nodeId) {
+		return $scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[nodeId].parent
+	} 
+	
+	$scope.findNodeInArray = function(nodeId, arr) {
+		var pos = -1;
+		for (var i = 0; i < arr.length; i++) {
+			if (arr[i].id === nodeId) {
+				pos = i;
+				break;
+			}
+		}
+		return pos;
+	} 
+	
+	
+	$scope.addNewLineBreak = function(isInside) {
 		var a = {
 			id: $scope.getNextId(),
 			type: 'formatting',
 			title: 'linebreak',
 			formatting: {
-				height: 10
+				height: 10,
+				width: 20
 			},
 			children: []
 		};
 
-		// if we have a current node, we want to add the line break as a child to it
-		// else, we put it as the first node
-		if ($scope.currentNode) {
+		// 
+		// 
+		if (isInside) { // user has requested a linebreak inside the currentnode
 			$scope.currentNode.children.push(a);
+			$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[a.id] = {node: a, parent: $scope.currentNode};
+		} else { // user has requested a linebreak as sibiling of currentnode
+			var parent = $scope.getParent($scope.currentNode.id);
+			if (parent) { // if has parent, add the line break to the children array, next to current node
+				var pos = $scope.findNodeInArray($scope.currentNode.id, parent.children);
+				parent.children.splice(pos + 1, 0, a);
+				$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[a.id] = {node: a, parent: parent};
+			} else { // does not have a parent. find the current Node at the top level array and add line break next
+				pos = $scope.findNodeInArray($scope.currentNode.id, $scope.data[$scope.selectedFileIndex].nodes);
+				$scope.data[$scope.selectedFileIndex].nodes.splice(pos + 1, 0, a);
+				$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[a.id] = {node: a, parent: undefined};
+			}
 		}
-		else {
-			$scope.data[$scope.selectedFileIndex].nodes.splice(0, 0, a);
-		}
+		// push to the end of flat nodes
+		$scope.dataflat[$scope.selectedFileIndex].flatnodes.push(a);
 	};
 
 	$scope.newSubItem = function(scope, idx) {
-		//		var parentNode = scope.$modelValue;
 		var parentNode = $scope.currentNode;
 		var newNode = {
 			id: $scope.getNextId(),
@@ -194,16 +262,7 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 		};
 		parentNode.children.push(newNode);
 		$scope.dataflat[$scope.selectedFileIndex].flatnodes.push(newNode);
+		$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[newNode.id] = {node: newNode, parent: parentNode};
 
 	};
-
-
-	$scope.collapseAll = function() {
-		$scope.$broadcast('collapseAll');
-	};
-
-	$scope.expandAll = function() {
-		$scope.$broadcast('expandAll');
-	};
-
 }]);

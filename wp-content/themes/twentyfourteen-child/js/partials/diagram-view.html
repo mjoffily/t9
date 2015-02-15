@@ -1,19 +1,20 @@
-<div>
-  show outline: <input type="checkbox"
-       ng-click="toggleOutline()">{{showOutline}}
-       </div>
+<div id="outlineDiv">
+  show outline:
+  <input type="checkbox" ng-click="toggleOutline()">Show jSON
+  <input type="checkbox" ng-click="toggleJson()">
+</div>
 <div class="row" id="diagramRow">
   <div class="col-lg-2" ng-show="showJson">
     <h3>Data binding</h3>
     <div class="info">
       {{info}}
     </div>
-    <pre class="code">{{ jSonHolder | json }}</pre>
+    <pre class="code">{{ file | json }}</pre>
   </div>
-  <div class="col-lg-6" id="canvasDiv">
+  <div id="canvasDiv">
     <svg id="svg" width="1500" height="1500"></svg>
   </div>
-  <div node-properties class="" id="nodepropertiesdiv" >
-    
+  <div node-properties class="" id="nodepropertiesdiv">
+
   </div>
 </div>

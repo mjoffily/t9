@@ -1,11 +1,8 @@
 <div id="selectViewDiv">
-    <ul class="">
-        <li>
-            <a ui-sref="home.file.diagram(idx)">diagram</a>
-        </li>
-        <li>
-            <a ui-sref="home.file.flatview(idx)">Flat view</a>
-        </li>
-    </ul>
+<tabset>
+    <tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disabled="tab.disabled" select="selectTab(tab.route, tab.idx)">
+        {{tab.content}}
+    </tab>
+</tabset>
 </div>
 <div ui-view></div>

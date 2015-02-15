@@ -4,8 +4,8 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 	$scope.tops = 0;
 	$scope.minWidth = 5;
 	$scope.minHeight = 5;
-	$scope.defaultWidth = 100;
-	$scope.defaultHeight = 100;
+	$scope.defaultWidth = 50;
+	$scope.defaultHeight = 50;
 	$scope.textPadding = 20;
 	$scope.padding = 10;
 	$scope.topPadding = 30;
@@ -116,30 +116,29 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 	$scope.draw = function draw() {
 		// calculate the width and height and x coordinate for all elements
 		for (var i = 0; i < $scope.file.length; i++) {
-			var elem = $scope.file[i];
-			$scope.sumWidth(i, elem, elem.children, $scope.file);
-			$scope.sumHeight(i, elem, elem.children, $scope.file);
+			var node = $scope.file[i];
+			$scope.sumWidth(i, node, node.children, $scope.file);
+			$scope.sumHeight(i, node, node.children, $scope.file);
 		}
 
 
-		//calculate the y coordinate and render all elements
+		//calculate the y coordinate and render all nodes
 		var offset = 0;
 		var offsetTop = 0;
 		var heighest = 0;
 		var line = 0;
 		for (var i = 0; i < $scope.file.length; i++) {
-			var elem = $scope.file[i];
-			elem.formatting.line = line;
+			node = $scope.file[i];
+			node.formatting.line = line;
+			var previousNodeIdx = i - 1;
 
-			// don't render or calculate y if this is a line break symbol
-			if (elem.type == 'formatting') {
+			if ($scope.file[previousNodeIdx] && $scope.file[previousNodeIdx].type === 'formatting') {
 				line++;
-				continue;
 			}
 
-			$scope.setTopLevelY(elem, $scope.file, i, line);
+			$scope.setTopLevelY(node, $scope.file, i, line);
 			$scope.calcYChildren({
-				elem: elem,
+				elem: node,
 				siblings: $scope.file
 			});
 		}
@@ -152,6 +151,8 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 		$scope.draggingInProgress = true;
 		d.formatting.originalx = d.formatting.x;
 		d.formatting.originaly = d.formatting.y;
+//		var recSelected = d3.select('#rect_' + d.id);
+//		recSelected.attr("height", 10).attr("width", 10);
 		// initialise the holder of overlapping objects
 		$scope.holder = [];
 	}
@@ -219,7 +220,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 	
 	$scope.dragend = function(d) {
 		var group = d3.select(this);
-		console.log('HOLDER END: ' + $scope.holder);
+		console.log('Dragged Obj: %o Target List:  %o ', d, $scope.holder);
 		// if we end the drag without overlapping with any other objects, we "cancel" the drag
 		// by returning the object to its original position
 		var dragOverlapAny = ($scope.holder.length > 0);
@@ -246,7 +247,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 			$scope.draw();
 			
 			
-		} else if ($scope.holder.length === 2) {
+		} else if ($scope.holder.length > 1) {
 	      // scenario 2 - dragged object overlaps with two objects. Priority will be given to the one at a deeper level of the tree
 	      //              as it is easy for the user to overlap only with a parent object. When it overlaps with the child, it must go
 	      //              over the parent and therefore the number of overlaping objects is two.
@@ -265,6 +266,8 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 	$scope.dragmove = function(d) {
 		// initialise list of overlapping objects
 		$scope.holder = [];
+		//var x += d3.event.dx;
+		//var y += d3.event.dy;
 		d.formatting.x += d3.event.dx;
 		d.formatting.y += d3.event.dy;
 		var group = d3.select(this);
@@ -282,7 +285,12 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 
 		// sort the data so objects are drawn in the correct order
 
-		var g = d3.select("svg").selectAll("g").data($scope.flatNodesForSelectedFile, function(d) {
+		var g = d3.select("svg").selectAll("g").data($scope.flatNodesForSelectedFile.filter(function(d) {
+			if ($scope.showOutline) {
+				return true; // if showing outline, show everything
+			} else {
+				return d.type === 'node';
+			}}), function(d) {
 				return d.id;
 			}).sort(function(a, b){
 			if (a.formatting.level === b.formatting.level) {
@@ -306,7 +314,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 		gEnter.append("text");
 					
 			
-	    g.attr("transform", function(d) {
+		g.attr("transform", function(d) {
 			return "translate(" + [d.formatting.x, d.formatting.y] + ")";
 		})
 		.on('click', function(d, i) { $scope.findNode(d.id)});
@@ -324,6 +332,9 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 		})
 		.style("fill", function(d, i) {
 			return d.formatting.fill;
+		})
+		.style("fill-opacity", function(d, i) {
+			return d.formatting.fillOpacity;
 		})
 		.style("stroke-width", function(d, i) {
 			return $scope.showOutline ? 1 : d.formatting.strokeWidth;
@@ -380,8 +391,18 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 		g.exit().remove();
 	};
 
+    // loops through array getting the height of the tallest element
+	$scope.getHighestHeight = function(data, from, to) {
+		var highest = 0;
+		for (var i = from; i <= to; i++) {
+			if (data[i].formatting.height > highest) 
+				highest = data[i].formatting.height;
+		}
+		return highest;
+	}
+	
 	$scope.setTopLevelY = function(elem, siblings, elemIndex, line) {
-		if (elemIndex == 0 || siblings[elemIndex - 1].type != 'formatting') {
+		if (elemIndex == 0 || siblings[elemIndex - 1].type !== 'formatting') {
 			if (elemIndex == 0) {
 				elem.formatting.y = 0;
 			}
@@ -396,25 +417,19 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 			var lineBreakHeight = siblings[elemIndex - 1].formatting.height;
 			var yOfPreviousLine = 0;
 
-			if (line > 1) {
-				yOfPreviousLine = siblings[elemIndex - 2].formatting.y;
+			if (line > 0) {
+				// if the line break is the very first node, it does not have sibilings 2 positions before
+				if (siblings[elemIndex - 2]) {
+					yOfPreviousLine = siblings[elemIndex - 2].formatting.y;
+				} else {
+					yOfPreviousLine = 0;
+				}
 			}
 
 			var heightOfHeighestSiblingOfPreviousLine = $scope.getHighestHeight(siblings, 0, (elemIndex - 2));
 			elem.formatting.y = lineBreakHeight + yOfPreviousLine + heightOfHeighestSiblingOfPreviousLine;
 		}
 	};
-
-	// loops through array getting the height of the tallest element
-	$scope.getHighestHeight = function(data, from, to) {
-		var highest = 0;
-		for (var i = from; i <= to; i++) {
-			if (data[i].formatting.height > highest)
-				highest = data[i].formatting.height;
-		}
-		return highest;
-	}
-
 
 	$scope.calcYChildren = function(renderObj) {
 
@@ -425,15 +440,14 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 		for (var elemIndex = 0; elemIndex < renderObj.elem.children.length; elemIndex++) {
 			var child = renderObj.elem.children[elemIndex];
 			var siblings = renderObj.elem.children;
+			var previousChildIdx = elemIndex - 1;
 
 			child.formatting.line = line;
 
-			// don't render or calculate y if this is a line break symbol
-			if (child.type == 'formatting') {
+			if (siblings[previousChildIdx] && siblings[previousChildIdx].type === 'formatting') {
 				line++;
-				continue;
 			}
-			//--------------------------------------------------------------------------------
+
 			if (elemIndex == 0 || siblings[elemIndex - 1].type != 'formatting') {
 				if (elemIndex == 0) {
 					child.formatting.y = renderObj.elem.formatting.y + $scope.topPadding;
@@ -444,16 +458,15 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 			}
 			else {
 				// this is a line break. The y of the element should be the y of heighest sibling of the previous line + the height of that sibling
-				// + the height defined for the line break itself
-				var lineBreakHeight = siblings[elemIndex - 1].formatting.height;
+				// Note that the height of the sibiling already takes into account the height of the line break. 
 				var yOfPreviousLine = 0;
 
 				if (line > 0) {
-					yOfPreviousLine = siblings[elemIndex - 2].formatting.y;
+					yOfPreviousLine = siblings[elemIndex - 1].formatting.y;
 				}
 
-				var heightOfHeighestSiblingOfPreviousLine = $scope.getHighestHeight(siblings, 0, (elemIndex - 2));
-				child.formatting.y = lineBreakHeight + yOfPreviousLine + heightOfHeighestSiblingOfPreviousLine;
+				var heightOfHeighestSiblingOfPreviousLine = $scope.getParent(child.id).formatting.heightPerLine[line - 1].height;
+				child.formatting.y = yOfPreviousLine + heightOfHeighestSiblingOfPreviousLine;
 			}
 			//--------------------------------------------------------------------------------
 
@@ -465,27 +478,30 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 	};
 
 	$scope.sumWidth = function sumWidth(elemIdx, elem, children, elemPeers) {
-		if (elem.type == 'formatting') {
-			return;
-		}
-		//elem.formatting.width = 0;
-		elem.formatting.x = 0;
-		var widthPerLine = [0, 0, 0, 0, 0];
+
+		var widthPerLine = [0];
 		var idx = 0;
 
 		// set the x of the element to the right of the previous element or zero if brand new line
 		var previousElementIdx = elemIdx - 1;
-		if (previousElementIdx >= 0) {
+		if (elemIdx >= 1) {
 			if (elemPeers[previousElementIdx].type != 'formatting') {
 				elem.formatting.x = elemPeers[previousElementIdx].formatting.x + elemPeers[previousElementIdx].formatting.width + $scope.padding;
+			} else {
+				elem.formatting.x = 0;
 			}
+			
+		} else {
+			elem.formatting.x = 0;
 		}
 
 		for (var i = 0; i < children.length; i++) {
 			var child = children[i];
-			if (child.type == 'formatting') {
+			var previousChildIdx = i - 1;
+
+			if (children[previousChildIdx] && children[previousChildIdx].type === 'formatting') {
+				widthPerLine.push(0);
 				idx++;
-				continue;
 			}
 
 			// initialize the x of the child element a bit to the right of the border of the elem.
@@ -493,7 +509,6 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 			child.formatting.x = elem.formatting.x + $scope.padding;
 
 			// if the element has sibilling, offset the x taking into account the x of the sibilling
-			var previousChildIdx = i - 1;
 			if (previousChildIdx >= 0) {
 				if (children[previousChildIdx].type != 'formatting') {
 					child.formatting.x = children[previousChildIdx].formatting.x + children[previousChildIdx].formatting.width + $scope.padding;
@@ -503,7 +518,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 			if (child.children.length > 0) {
 				$scope.sumWidth(i, child, child.children, children);
 			}
-			if (child.formatting.width < $scope.minWidth) {
+			if (!child.formatting.width || child.formatting.width < $scope.minWidth) {
 				child.formatting.width = $scope.defaultWidth;
 			}
 
@@ -511,14 +526,14 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 			widthPerLine[idx] = widthPerLine[idx] + child.formatting.width + $scope.padding;
 		};
 
-		// Sort the line widths so we can get the heighest number. The width of the elem must be the 
-		// at least the width of the longest line (assuming page breaks)
+		// Sort the line widths so we can get the heighest number. The width of the elem must be  
+		// at least the width of the longest line of its children (assuming page breaks)
 		widthPerLine.sort(function(a, b) {
 			return a - b
 		});
 
 		var minWidthCalc = widthPerLine[widthPerLine.length - 1] + ($scope.padding);
-		if (elem.formatting.width < minWidthCalc) {
+		if (!elem.formatting.width || elem.formatting.width < minWidthCalc) {
 			elem.formatting.width = minWidthCalc;
 		}
 
@@ -528,38 +543,24 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 	};
 
 	$scope.sumHeight = function sumHeight(elemIdx, elem, children, elemPeers) {
-		if (elem.type == 'formatting') {
-			return;
-		}
-		var heightPerLine = [0, 0, 0, 0, 0];
+		var heightPerLine = [0];
 		var idx = 0;
 		elem.formatting.y = 0;
 
-		//		var previousElementIdx = elemIdx - 1;
-		//		if (previousElementIdx >= 0) {
-		//			if (elemPeers[previousElementIdx].type == 'formatting') {
-		//				elem.formatting.y = elemPeers[previousElementIdx].formatting.y + elemPeers[previousElementIdx].height + $scope.padding;
-		//			}
-		//		}  
-
 		for (var i = 0; i < children.length; i++) {
 			var child = children[i];
-			if (child.type === 'formatting') {
+			var previousChildIdx = i - 1;
+			var lineBreakHeight = 0;
+
+			if (children[previousChildIdx] && children[previousChildIdx].type === 'formatting') {
 				idx++;
-				continue;
+				heightPerLine.push(0);
+				lineBreakHeight = children[previousChildIdx].formatting.height;
 			}
 
 			// initialize the y of the child element to the bottom of the top border of the elem.
 			// This will change further down if there are line breaks as sibilling elements.
 			child.formatting.y = elem.formatting.y + $scope.topPadding;
-
-			// if the element has sibilling, offset the x taking into account the x of the sibilling
-			//			var previousChildIdx = i - 1;
-			//			if (previousChildIdx >= 0) {
-			//				if (children[previousChildIdx].type == 'formatting') {
-			//					child.formatting.y = children[previousChildIdx].formatting.y + children[previousChildIdx].height + $scope.padding;
-			//				}
-			//			}  
 
 			if (child.children.length > 0) {
 				$scope.sumHeight(i, child, child.children, children);
@@ -570,7 +571,11 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 
 			// save height for the current line
 			if (child.formatting.height > heightPerLine[idx]) {
-				heightPerLine[idx] = child.formatting.height + $scope.padding;
+				if (lineBreakHeight > 0) {
+					heightPerLine[idx] = child.formatting.height + lineBreakHeight;
+				} else {
+					heightPerLine[idx] = child.formatting.height + $scope.padding;
+				}
 			}
 
 			// debug
@@ -578,7 +583,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 		};
 
 		// store the number of lines in the elem for helping with rendering later.
-		if (elem.type != 'formatting') {
+		if (elem.type !== 'formatting') {
 			elem.formatting.numLines = idx + 1;
 		}
 		// sum the height of each line for the children
@@ -591,7 +596,14 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 				"height": heightPerLine[i]
 			};
 		}
-		var elemExpectedMinHeight = (totalHeight + $scope.padding + $scope.topPadding);
+		
+		var elemExpectedMinHeight = 0;
+		// if the element has children, its minimum height must be the height of each of the lines
+		// for the children combined plus some padding
+		
+		if (elem.children.length > 0) {
+			elemExpectedMinHeight = (totalHeight + $scope.padding + $scope.topPadding);
+		}
 
 		// set minimum height if the object is shorter than minimum
 		// otherwise do nothing as the user may have set the hight
@@ -636,12 +648,44 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 		$scope.currentNode.formatting.height = $scope.currentNode.formatting.height - 20;
 	}
 
-	$scope.makeLonger = function() {
-		$scope.currentNode.formatting.width = $scope.currentNode.formatting.width + 20;
+	$scope.applyHeightToSibilings = function() {
+		var parent = $scope.getParent($scope.currentNode.id)
+		if (parent && parent.children.length > 0) {
+			for(var i = 0; i < parent.children.length; i++) {
+				if (parent.children[i].type === 'node') {
+ 					parent.children[i].formatting.height = $scope.currentNode.formatting.height;
+				}
+			}
+		}
+	}
+
+	$scope.applyWidthToSibilings = function() {
+		var parent = $scope.getParent($scope.currentNode.id)
+		if (parent && parent.children.length > 0) {
+			for(var i = 0; i < parent.children.length; i++) {
+				if (parent.children[i].type === 'node') {
+					parent.children[i].formatting.width = $scope.currentNode.formatting.width;
+				}
+			}
+		}
+	}
+	$scope.applyFillOpacityToSibilings = function() {
+		var parent = $scope.getParent($scope.currentNode.id)
+		if (parent && parent.children.length > 0) {
+			for(var i = 0; i < parent.children.length; i++) {
+				if (parent.children[i].type === 'node') {
+					parent.children[i].formatting.fillOpacity = $scope.currentNode.formatting.fillOpacity;
+				}
+			}
+		}
 	}
 
 	$scope.makeLessLong = function() {
 		$scope.currentNode.formatting.width = $scope.currentNode.formatting.width - 20;
+	}
+
+	$scope.makeLonger = function() {
+		$scope.currentNode.formatting.width = $scope.currentNode.formatting.width + 20;
 	}
 
 	$scope.increaseFontSize = function() {
@@ -708,11 +752,22 @@ app.controller('diagramCtrl', ['$scope', '$parse', 'ngDialog', '$stateParams', '
 		return (targetId === $scope.flatIndexedNodesForSelectedFile[objBeingDraggedId].parent.id);
 	}
 	
+	$scope.targetIsChild = function(targetId, draggedObjChildren) {
+		for (var i = 0; i < draggedObjChildren.length; i++) {
+			if (draggedObjChildren[i].id === targetId) {
+				return true;
+			} else if ($scope.targetIsChild(targetId, draggedObjChildren[i].children)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	$scope.findDragOver = function(objArr, mousex, mousey, highlight, holder, objBeingDragged) {
 		for (var i = 0; i < objArr.length; i++) {
 			var target = objArr[i];
 
-			if (target.id !== objBeingDragged.id && !$scope.targetIsParent(target.id,  objBeingDragged.id)) {
+			if (target.type === 'node' && target.id !== objBeingDragged.id && !$scope.targetIsParent(target.id,  objBeingDragged.id) && !$scope.targetIsChild(target.id, objBeingDragged.children)) {
 				var overlapingRight = $scope.isOverlapingOnTheRight(mousex, mousey, target, objBeingDragged);
 				var overlapingLeft = $scope.isOverlapingOnTheLeft(mousex, mousey, target, objBeingDragged);
 				var group = d3.select("#group_" + target.id);
@@ -731,8 +786,7 @@ console.log(overlapingLeft, overlapingRight);
 						group.style("stroke-width", 2)
 						.style("stroke", "pink");
 					}
-				}
-				else {
+				} else {
 					// Nope, we did not hit any objects yet
 					if (highlight) {
 						// remove highlighting
@@ -755,11 +809,19 @@ console.log(overlapingLeft, overlapingRight);
 		// without touching any other objects. The purpose here is to move the object
 		// to the top of the tree. In this case, we se the target as the last node in the top
 		// level of the tree so this one is moved next to it at the top
-		if (holder.length == 0 && objBeingDragged.formatting.level > 0) {
-			holder.push($scope.file[$scope.file.length - 1]);
+		if ((!overlapingRight && !overlapingLeft) && holder.length == 0 && objBeingDragged.formatting.level > 0) {
+			var parent = $scope.flatIndexedNodesForSelectedFile[objBeingDragged.id].parent;
+
+			overlapingRight = $scope.isOverlapingOnTheRight(mousex, mousey, parent, objBeingDragged);
+			overlapingLeft = $scope.isOverlapingOnTheLeft(mousex, mousey, parent, objBeingDragged);
+			var overlapParent = (overlapingLeft || overlapingRight);
+			if (!overlapParent) {
+				holder.push($scope.file[$scope.file.length - 1]);
+			}
 		}
 
 	}
+	
 	
 	$scope.shadeBlend = function(p, c0, c1) {
 		var n = p < 0 ? p * -1 : p,

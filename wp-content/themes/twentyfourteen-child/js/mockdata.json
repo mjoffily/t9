@@ -123,8 +123,10 @@
         "type": "formatting",
         "title": "linebreak",
         "formatting": {
-          "height": 10,
+          "height": 20,
           "line": 0,
+          "level": 1,
+          "width": 20,
           "nodeselected": false
         },
         "children": []
@@ -157,8 +159,10 @@
         "type": "formatting",
         "title": "linebreak",
         "formatting": {
-          "height": 10,
+          "height": 20,
+          "level": 1,
           "line": 1,
+          "width": 20,
           "nodeselected": false
         },
         "children": []
@@ -193,8 +197,10 @@
     "type": "formatting",
     "title": "linebreak",
     "formatting": {
-      "height": 10,
+      "height": 20,
+      "level": 0,
       "line": 0,
+      "width": 20,
       "nodeselected": false
     },
     "children": []
@@ -280,7 +286,7 @@
           "fontFamily": "Verdana, Geneva, sans-serif",
           "fontColor": "#FFFFFF",
           "fontSize": 12,
-          "level": 0,
+          "level": 1,
           "x": 320,
           "y": 170,
           "numLines": 2,
@@ -305,8 +311,10 @@
         "type": "formatting",
         "title": "linebreak",
         "formatting": {
-          "height": 10,
+          "height": 20,
+          "level": 1,
           "line": 0,
+          "width": 20,
           "nodeselected": false
         },
         "children": []
@@ -339,8 +347,10 @@
         "type": "formatting",
         "title": "linebreak",
         "formatting": {
-          "height": 10,
+          "height": 20,
+          "level": 1,
           "line": 1,
+          "width": 20,
           "nodeselected": false
         },
         "children": []
@@ -352,8 +362,10 @@
     "type": "formatting",
     "title": "linebreak",
     "formatting": {
-      "height": 10,
+      "height": 20,
+      "level": 0,
       "line": 1,
+      "width": 20,
       "nodeselected": false
     },
     "children": []
@@ -728,8 +740,10 @@
         "type": "formatting",
         "title": "linebreak",
         "formatting": {
-          "height": 10,
+          "height": 20,
+          "level": 1,
           "line": 0,
+          "width": 20,
           "nodeselected": false
         },
         "children": []

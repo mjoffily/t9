@@ -102,7 +102,9 @@ nice, td {
 }
 
 #diagramRow {
- border: 3px dashed green;
+ background-color: wheat;
+ margin-top: 20px;
+ margin-bottom: 20px;
 }
 
 
@@ -124,9 +126,10 @@ nice, td {
 }
 
 #canvasDiv {
- border: 3px dashed pink;
  float: left;
- width: 80%;
+ margin-top: 20px;
+ padding-left: 40px;
+ background-color: white;
 }
 
 #nodepropertiesdiv {
@@ -137,7 +140,8 @@ nice, td {
 }
 
 #selectViewDiv {
- border: 2px solid blueviolet;
+ padding-top: 2px;
+ padding-bottom: 2px;
 }
 
 #flatViewDiv {
@@ -159,16 +163,12 @@ nice, td {
 }
 
 #fileSelectContainer {
- border: 3px dashed pink;
-  overflow: hidden;
 }
 
 #fileSelect {
- border: 3px solid black;
  float:left;
 }
 #fileName {
- border: 3px dotted red;
  float:left;
  font-size: 16px;
  margin-left:40px;
@@ -256,4 +256,10 @@ nice, td {
 .groupclass {
     stroke: orange;
     fill: grey;
+}
+
+#outlineDiv {
+ padding-top: 3px;
+ padding-bottom: 3px;
+}
 }
