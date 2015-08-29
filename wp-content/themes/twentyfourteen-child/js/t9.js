@@ -1,13 +1,15 @@
 'use strict';
 
-var app = angular.module('treeApp', ['ui.tree', 'colorpicker.module', 'ngDialog', 'xeditable', 'ui.router', 'ui.bootstrap']);
+var app = angular.module('t9', ['colorpicker.module', 'ngMaterial', 'xeditable', 'ui.router', 'ui.bootstrap']);
 
 app.run(function($rootScope, $state) {
     $rootScope.$state = $state;    
 });
 
-app.config(function($stateProvider, $urlRouterProvider, $locationProvider) {
+app.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', '$sceDelegateProvider', function($stateProvider, $urlRouterProvider, $locationProvider, $sceDelegateProvider) {
         $locationProvider.html5Mode(true);
+        $sceDelegateProvider.resourceUrlWhitelist(['self', 'https://source-mjoffily.c9.io/go/template/tabs/tab.html', 'https://source-mjoffily.c9.io/go/template/tabs/tabset.html']);
+        
         $stateProvider.state('home', {
                 url: "/",
                 templateUrl: SiteParameters.theme_directory + '/js/partials/main-view.html'
@@ -28,7 +30,7 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider) {
                 controller: 'flatViewCtrl'
             })
 
-    });
+    }]);
 
 app.filter('slice', function() {
     return function(arr, start, end) {
@@ -51,25 +53,71 @@ app.filter('title', function() {
     };
 });
 
-// app.filter('name', function() {
-//     return function(items, title) {
-//         var filteredNodes = [];
-//         angular.forEach(items, function(item) {
-//             var metadataFiltered = [];
-//             angular.forEach(metadataList, function(metadata) {
-//                 if (metadata.name.toLowerCase().indexOf(name.toLowerCase()) >= 0) {
-//                     metadatafiltered.push(metadata);
-//                 }
-//             });
-//             if (metadataFiltered.length > 0) {
-                
-//                 filteredNodes.push()
-//             }
-            
-//         });
-//         return filtered;
-//     };
-// });
+app.filter('titleWithMap', function() {
+    return function(items, title) {
+        var filtered = [];
+        angular.forEach(items, function(item) {
+            if (item.title.toLowerCase().indexOf(title.toLowerCase()) >= 0) {
+                filtered[item.id] = item;
+            }
+        });
+        return filtered;
+    };
+});
+
+app.filter('nodeType', function() {
+    return function(items) {
+        var filtered = [];
+        angular.forEach(items, function(item) {
+            if (item.type === 'node') {
+                filtered.push(item);
+            }
+        });
+        return filtered;
+    };
+});
+
+app.filter('nodeVisible', function() {
+    return function(items) {
+        var filtered = [];
+        angular.forEach(items, function(item) {
+            if (item.formatting.visible) {
+                filtered.push(item);
+            }
+        });
+        return filtered;
+    };
+});
+
+app.filter('attributeName', function() {
+    return function(items, name) {
+        var filteredNodes = [];
+        angular.forEach(items, function(item) {
+            for (var i = 0; i < item.metadata.length; i++) {
+                if (item.metadata[i].name.toLowerCase().indexOf(name.toLowerCase()) >= 0) {
+                    filteredNodes[item.id] = item;
+                    break;
+                }
+            }
+        });
+        return filteredNodes;
+    };
+});
+
+app.filter('attributeValue', function() {
+    return function(items, value) {
+        var filteredNodes = [];
+        angular.forEach(items, function(item) {
+            for (var i = 0; i < item.metadata.length; i++) {
+                if (item.metadata[i].value.toLowerCase().indexOf(value.toLowerCase()) >= 0) {
+                    filteredNodes[item.id] = item;
+                    break;
+                }
+            }
+        });
+        return filteredNodes;
+    };
+});
 
 app.filter('value', function() {
     return function(items, title) {

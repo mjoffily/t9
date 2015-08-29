@@ -1,0 +1,181 @@
+<h3>Properties for {{currentNode.title}}</h3>
+<div class="containerDiv">
+
+	<div class="rowDiv">
+		<div class="cellDiv">Title</div>
+		<div class="cellDiv">
+			<input ng-model="currentNode.title" value="{currentNode.title}" type="text" class="input-sm">
+		</div>
+		<div class="cellDiv">
+			<input type="checkbox" ng-click="toggleVisible()" ng-model="currentNode.formatting.visible">visible</div>
+	</div>
+</div>
+<div class="containerDiv">
+	<div class="rowDiv">
+		<div class="cellDiv">Height</div>
+		<div class="cellDiv">
+			<input ng-model="currentNode.formatting.height" value="{currentNode.formatting.height}" type="number" class="input-sm">
+		</div>
+		<div class="cellDiv">
+			<button class="btn-xs" ng-model="currentNode.formatting.height" ng-click="makeShorter()" value="{currentNode.formatting.height}">Down</button>
+		</div>
+		<div class="cellDiv">
+			<button class="btn-xs" ng-model="currentNode.formatting.height" ng-click="makeTaller()" value="{currentNode.formatting.height}">Up</button>
+		</div>
+		<div class="cellDiv">
+			<button class="btn btn-xs" ng-click="applyFormattingToSibilings(currentNode, 'height', true)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			</button>
+			<button class="btn btn-xs" ng-click="applyFormattingToSibilings(currentNode, 'height', false)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			</button>
+		</div>
+	</div>
+	<div class="rowDiv">
+		<div class="cellDiv">Width</div>
+		<div class="cellDiv">
+			<input ng-model="currentNode.formatting.width" value="{currentNode.formatting.width}" type="number" class="input-sm">
+		</div>
+		<div class="cellDiv">
+			<button class="btn-xs" ng-model="currentNode.formatting.width" ng-click="makeLessLong()" value="{currentNode.formatting.width}">Down</button>
+		</div>
+		<div class="cellDiv">
+			<button class="btn-xs" ng-model="currentNode.formatting.width" ng-click="makeLonger()" value="{currentNode.formatting.width}">Up</button>
+		</div>
+		<div class="cellDiv">
+			<button class="btn btn-xs" ng-click="applyFormattingToSibilings(currentNode, 'width', true)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			</button>
+			<button class="btn btn-xs" ng-click="applyFormattingToSibilings(currentNode, 'width', false)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			</button>
+		</div>
+	</div>
+	<div class="rowDiv">
+		<div class="cellDiv">Fill color</div>
+		<div class="cellDiv">
+			<input id=color colorpicker ng-model="currentNode.formatting.fill" type="text" class="input-sm">
+		</div>
+		<div class="cellDiv">&nbsp;</div>
+		<div class="cellDiv">&nbsp;</div>
+		<div class="cellDiv">
+			<button class="btn btn-xs" ng-click="applyFormattingToSibilings(currentNode, 'fill', true)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			</button>
+			<button class="btn btn-xs" ng-click="applyFormattingToSibilings(currentNode, 'fill', false)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			</button>
+		</div>
+	</div>
+	<div class="rowDiv">
+		<div class="cellDiv">Fill opacity</div>
+		<div class="cellDiv">
+			<input id=fillopacity ng-model="currentNode.formatting.fillOpacity" type="number" min='0' max='1' step='0.1' class="input-sm">
+		</div>
+		<div class="cellDiv">&nbsp;</div>
+		<div class="cellDiv">&nbsp;</div>
+		<div class="cellDiv">
+			<button class="btn btn-xs" ng-click="applyFormattingToSibilings(currentNode, 'fillOpacity', true)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			</button>
+			<button class="btn btn-xs" ng-click="applyFormattingToSibilings(currentNode, 'fillOpacity', false)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			</button>
+		</div>
+	</div>
+	<div class="rowDiv">
+		<div class="cellDiv">Shape</div>
+		<div class="cellDiv">
+			<select id=shape ng-model="currentNode.formatting.showas" ng-options="shape as shape for shape in shapes"></select>
+		</div>
+		<div class="cellDiv">&nbsp;</div>
+		<div class="cellDiv">&nbsp;</div>
+		<div class="cellDiv applySibiling">apply to sibilings</div>
+	</div>
+	<div class="rowDiv">
+		<div class="cellDiv">Border size</div>
+		<div class="cellDiv">
+			<select id=borderThickness ng-model="currentNode.formatting.strokeWidth" ng-options="nbr as nbr for nbr in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]"></select>
+		</div>
+		<div class="cellDiv">
+			<button class="btn-xs" ng-model="currentNode.formatting.strokeWidth" ng-click="makeStrokeThinner()" value="{currentNode.formatting.strokeWidth}">Down</button>
+		</div>
+		<div class="cellDiv">
+			<button class="btn-xs" ng-model="currentNode.formatting.strokeWidth" ng-click="makeStrokeThicker()" value="{currentNode.formatting.strokeWidth}">Up</button>
+		</div>
+		<div class="cellDiv">
+			<button class="btn btn-xs" ng-click="applyFormattingToSibilings(currentNode, 'strokeWidth', true)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			</button>
+			<button class="btn btn-xs" ng-click="applyFormattingToSibilings(currentNode, 'strokeWidth', false)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			</button>
+		</div>
+	</div>
+	<div class="rowDiv">
+		<div class="cellDiv">Font</div>
+		<div class="cellDiv">
+			<select class="field" id=font ng-model="currentNode.formatting.fontFamily" ng-options="ft as ft for ft in ['Verdana', 'Calibri', 'Arial', 'Avant Garde', 'Impact']"></select>
+		</div>
+		<div class="cellDiv">&nbsp;</div>
+		<div class="cellDiv">&nbsp;</div>
+		<div class="cellDiv">
+			<button class="btn btn-xs" ng-click="applyFormattingToSibilings(currentNode, 'fontFamily', true)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			</button>
+			<button class="btn btn-xs" ng-click="applyFormattingToSibilings(currentNode, 'fontFamily', false)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			</button>
+		</div>
+	</div>
+	<div class="rowDiv">
+		<div class="cellDiv">Font size</div>
+		<div class="cellDiv">
+			<select id=fontSize ng-model="currentNode.formatting.fontSize" ng-options="ftSize as ftSize for ftSize in [6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]"></select>
+		</div>
+		<div class="cellDiv">
+			<button class="btn-xs" ng-model="currentNode.formatting.fontSize" ng-click="decreaseFontSize()" value="{currentNode.formatting.fontSize}">Down</button>
+		</div>
+		<div class="cellDiv">
+			<button class="btn-xs" ng-model="currentNode.formatting.fontSize" ng-click="increaseFontSize()" value="{currentNode.formatting.fontSize}">Up</button>
+		</div>
+		<div class="cellDiv">
+			<button class="btn btn-xs" ng-click="applyFormattingToSibilings(currentNode, 'fontSize', true)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			</button>
+			<button class="btn btn-xs" ng-click="applyFormattingToSibilings(currentNode, 'fontSize', false)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			</button>
+		</div>
+	</div>
+	<div class="rowDiv">
+		<div class="cellDiv">Font color</div>
+		<div class="cellDiv">
+			<input id=fontColor colorpicker ng-model="currentNode.formatting.fontColor" type="text" class="input-sm">
+		</div>
+		<div class="cellDiv">&nbsp;</div>
+		<div class="cellDiv">&nbsp;</div>
+		<div class="cellDiv">
+			<button class="btn btn-xs" ng-click="applyFormattingToSibilings(currentNode, 'fontColor', true)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			</button>
+			<button class="btn btn-xs" ng-click="applyFormattingToSibilings(currentNode, 'fontColor', false)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			</button>
+		</div>
+	</div>
+	<div class="rowDiv">
+		<div class="cellDiv">
+			<button class="btn-xs" ng-click="addNewNode()">New node</button>
+		</div>
+		<div class="cellDiv">
+			<button class="btn-xs" ng-click="addNewNodeAsSibiling()">New Sibiling</button>
+		</div>
+		<div class="cellDiv">
+			<button class="btn-xs" ng-click="newSubItem(this, fileIndex)" value="currentNode" ng-model="currentNode">New child</button>
+		</div>
+		<div class="cellDiv">
+			<button class="btn-xs" ng-click="deleteNode()" value="currentNode" ng-model="currentNode">Delete Node</button>
+		</div>
+		<div class="cellDiv">&nbsp;</div>
+	</div>
+</div>
+<div class="containerDiv">
+	<div class="rowDiv">
+		<div class="cellDiv">Line break formatting</div>
+	</div>
+</div>
+<div class="containerDiv">
+	<div class="rowDiv">
+		<div class="cellDiv">
+			<button class="btn-xs" ng-click="addNewLineBreak(false)" value="currentNode" ng-model="currentNode">Add line break next</button>
+		</div>
+		<div class="cellDiv">
+			<button class="btn-xs" ng-click="addNewLineBreak(true)" value="currentNode" ng-model="currentNode">Add line break inside</button>
+		</div>
+	</div>
+</div>

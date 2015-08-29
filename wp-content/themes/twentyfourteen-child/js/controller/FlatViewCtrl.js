@@ -1,4 +1,4 @@
-app.controller('flatViewCtrl', ['$scope', '$stateParams', 'titleFilter', 'valueFilter', function($scope, $stateParams, titleFilter, valueFilter) {
+app.controller('flatViewCtrl', ['$scope', '$stateParams', 'titleFilter', 'valueFilter', 'nodeTypeFilter', 'nodeVisibleFilter', function($scope, $stateParams, titleFilter, valueFilter, nodeTypeFilter, nodeVisibleFilter) {
 	$scope.searchname = "";
 	$scope.searchvalue = "";
 	$scope.searchtitle = "";
@@ -28,7 +28,9 @@ app.controller('flatViewCtrl', ['$scope', '$stateParams', 'titleFilter', 'valueF
 	});
 
 	$scope.filter = function() {
-		$scope.filterednodes = titleFilter($scope.flatnodes, $scope.searchtitle);
+		$scope.filterednodes = nodeTypeFilter($scope.flatnodes);
+		$scope.filterednodes = nodeVisibleFilter($scope.filterednodes);
+		$scope.filterednodes = titleFilter($scope.filterednodes, $scope.searchtitle);
 //		$scope.filterednodes = nameFilter($scope.filterednodes, $scope.searchname);
 		$scope.filterednodes = valueFilter($scope.filterednodes, $scope.searchvalue);
 	}
@@ -58,12 +60,14 @@ app.controller('flatViewCtrl', ['$scope', '$stateParams', 'titleFilter', 'valueF
 		return new Array(ret);
 	};
 
-	$scope.addRow = function(idx) {
-		$scope.flatnodes[idx].metadata.push({
+	$scope.addRow = function(nodeId) {
+		var node = $scope.findNodeInMap(nodeId);
+		node.metadata.push({
 			name: "newname",
 			value: "newvalue"
 		});
 	};
+	
 	$scope.removeRow = function(d) {
 		$scope.flatnodes[idx].metadata.splice(d, 1);
 	};

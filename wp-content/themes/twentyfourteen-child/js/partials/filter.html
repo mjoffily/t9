@@ -1,0 +1,15 @@
+  <div class="lefty" id="filter">
+    <div class="lefty"> Filter:
+      <button class="btn btn-xs" ng-click="alert('hey')"><span class="glyphicon glyphicon-plus"></span>Add criteria</button>
+    </div>
+    <div class="lefty">
+      <ul>
+        <li ng-repeat="criteria in filter.currentFilterCriteria track by $index">
+          <select ng-model="filter.currentFilterCriteria[$index].id" ng-options="obj.text for obj in filter.filterOptions track by obj.id"></select>
+          <input ng-model="filter.currentFilterCriteria[$index].text" type="text" placeholder="Any...">
+          <button class="btn btn-xs" ng-click="deleteFilterCriteria($index)"><span class="glyphicon glyphicon-remove"></span></button>
+        </li>
+      </ul>
+    </div>
+    <div class="lefty" ng-show="filter.currentFilterCriteria.length > 0"><button class="btn btn-xs" ng-click="applyFilter()"><span class="glyphicon glyphicon-flash"></span>Apply</button></div>
+  </div>

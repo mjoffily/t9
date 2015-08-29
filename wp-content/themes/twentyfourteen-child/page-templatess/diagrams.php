@@ -10,10 +10,10 @@
                     <span class="sr-only">Split button!</span>
                 </button>
                 <ul class="dropdown-menu" role="menu">
-                    <li ng-repeat="file in data track by $index" value="{{$index}}"><a href="" ng-click="goToPage($index)">{{file.envName}}</a>
+                    <li ng-repeat="file in data track by $index" value="{{$index}}"><a href="" ng-click="goToFile($index)">{{file.envName}}</a>
                     </li>
                     <li class="divider"></li>
-                    <li><a href="#">New File</a>
+                    <li><a href="" ng-click="newFile()">New File</a>
                     </li>
                 </ul>
             </div>

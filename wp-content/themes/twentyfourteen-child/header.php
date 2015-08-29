@@ -31,7 +31,7 @@
 	<?php wp_head(); ?>
 </head>
 
-<body ng-app="treeApp" <?php body_class(); ?>>
+<body ng-app="t9" <?php body_class(); ?>>
 <div>
 	<?php if ( get_header_image() ) : ?>
 	<div id="site-header">

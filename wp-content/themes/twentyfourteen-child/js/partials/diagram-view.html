@@ -1,20 +1,49 @@
-<div id="outlineDiv">
-  show outline:
-  <input type="checkbox" ng-click="toggleOutline()">Show jSON
-  <input type="checkbox" ng-click="toggleJson()">
-</div>
-<div class="row" id="diagramRow">
-  <div class="col-lg-2" ng-show="showJson">
-    <h3>Data binding</h3>
-    <div class="info">
-      {{info}}
-    </div>
-    <pre class="code">{{ file | json }}</pre>
-  </div>
-  <div id="canvasDiv">
-    <svg id="svg" width="1500" height="1500"></svg>
-  </div>
-  <div node-properties class="" id="nodepropertiesdiv">
+<div layout="column" layout-fill>
 
+  <div flex layout="row">
+    <div flex-lg="50" flex-gt-lg="33" flex-md="50" layout="row" layout-align="start start">
+      <md-checkbox ng-click="toggleOutline()" aria-label="Show outline" flex>
+        Show outline
+      </md-checkbox>
+      <md-checkbox ng-click="toggleJson()" aria-label="Show JSon" flex>
+        Show JSon
+      </md-checkbox>
+      <md-checkbox ng-click="toggleDebug()" aria-label="debug" flex>
+        Debug
+      </md-checkbox>
+    </div>
   </div>
+
+  <!--<div node-properties template="filter.html" filter="filter" class="" id="filterpropertiesdiv"></div>-->
+  <div node-properties class="" id="nodepropertiesdiv"></div>
+
+  <section flex>
+    <div flex layout="row">
+      <div flex="70">
+        <div ng-show="showJson">
+          <h3>Data binding</h3>
+          <div class="info">
+            {{info}}
+          </div>
+          <pre class="code">{{ file | json }}</pre>
+        </div>
+        <div flex id="canvasDiv">
+          <svg id="svg" width="1500" height="1500"></svg>
+        </div>
+      </div>
+    <section flex="30" layout="vertical">
+      <md-sidenav class="md-sidenav-right md-whiteframe-z2" flex md-component-id="right" md-is-locked-open="sidenavOpen">
+        <md-toolbar class="md-theme-light">
+          <h1 class="md-toolbar-tools">{{currentNode.title}}<br/>
+                <md-checkbox ng-click="toggleVisible()" aria-label="visible" flex>
+        Visible
+      </md-checkbox>
+</h1>
+        </md-toolbar>
+        <md-content class="md-padding" node-properties template="popup.html" current-node="currentNode" id="nodepropertiesdiv" >
+        </md-content>
+      </md-sidenav>
+    </section>
+    </div>
+  </section>
 </div>

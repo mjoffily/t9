@@ -1,145 +1,379 @@
-<h3>Properties for {{currentNode.title}}</h3>
-<div class="containerDiv">
-
-	<div class="rowDiv">
-		<div class="cellDiv">Title</div>
-		<div class="cellDiv">
-			<input ng-model="currentNode.title" value="{currentNode.title}" type="text">
+<div layout="column" class="containerDiv" layout-align="start center">
+	
+	<md-toolbar class="md-primary md-default-theme">
+		<div layout="row" layout-align="space-between start">
+		<h1 ng-dblclick="toggleEditor(currentNode)" flex class="md-toolbar-tools" >
+      		<span ng-hide="currentNode.editorEnabled">{{currentNode.title}}</span>
+      		<form ng-submit="toggleEditor(currentNode)" ng-show="currentNode.editorEnabled">
+              <input class="editable" ng-model="currentNode.title">
+          </form> 
+    	</h1>
+		<div flex> 
+			<md-checkbox aria-label="visible" ng-model="currentNode.formatting.visible" flex>
+	        visible
+    	  </md-checkbox>
 		</div>
-		<div class="cellDiv">&nbsp;</div>
-		<div class="cellDiv">&nbsp;</div>
-		<div class="cellDiv">&nbsp;</div>
+		<div flex>
+			<md-button flex class="mdbutton" ng-click="toggleControls()"><span ng-class="getClass()"></span></md-button>
+		</div>
+		</div>
+	</md-toolbar>
+
+	<div flex layout="row" layout-align="space-around" class="tabrow green" ng-show="showControls">
+		<div class="center" flex>
+			<md-button class="md-fab md-primary md-button md-default-theme" ng-click="addNewNode()">
+				<md-icon md-svg-src="{{ getIcon('newnode.svg') }}"  class="s24" alt="Cake"></md-icon>
+			</md-button>
+		</div>
+		<div class="center" flex>
+			<md-button class="md-fab md-primary md-button md-default-theme" ng-click="addNewNodeAsSibiling()">
+				<md-icon md-svg-src="{{ getIcon('sibilingnode.svg') }}"  class="s24" alt="Cake"></md-icon>
+			</md-button>
+		</div>
+		<div class="center" flex>
+			<md-button class="md-fab md-primary md-button md-default-theme" ng-click="newSubItem(this, fileIndex)" >
+				<md-icon md-svg-src="{{ getIcon('childnode.svg') }}"  class="s24" alt="Cake"></md-icon>
+			</md-button>
+		</div>
+		<div class="center" flex>
+			<md-button class="md-fab md-primary md-button md-default-theme" ng-click="deleteNode()" >
+				<md-icon md-svg-src="{{ getIcon('deletenode.svg') }}"  class="s24" alt="Cake"></md-icon>
+			</md-button>
+		</div>
 	</div>
-	<div class="rowDiv">
-		<div class="cellDiv">Height</div>
-		<div class="cellDiv">
+
+
+
+	<div id="height" flex layout="row" layout-align="space-around" class="tabrow green" ng-show="showControls">
+		<div class="green" flex="50" layout-align="center center">
+			Height:
 			<input ng-model="currentNode.formatting.height" value="{currentNode.formatting.height}" type="number">
 		</div>
-		<div class="cellDiv">
-			<button ng-model="currentNode.formatting.height" ng-click="makeShorter()" value="{currentNode.formatting.height}">Down</button>
+		<div flex="25" class="green" layout-align="center center">
+			<div flex>
+			<span flex>
+				<md-button class="mdbutton" ng-model="currentNode.formatting.height" ng-click="makeTaller()" value="{currentNode.formatting.height}">
+					<md-icon md-svg-src="{{ getIcon('up.svg') }}"  class="s24" alt="Up"></md-icon>
+					<md-tooltip>
+        				Increase height by 20 pixels
+      				</md-tooltip>
+				</md-button>
+			</span>
+			<span flex>
+				<md-button class="mdbutton" ng-model="currentNode.formatting.height" ng-click="makeShorter()" value="{currentNode.formatting.height}">
+					<md-icon md-svg-src="{{ getIcon('down.svg') }}"  class="s24" alt="Down"></md-icon>
+					<md-tooltip>
+        				Decrease height by 20 pixels
+      				</md-tooltip>
+				</md-button>
+			</span>
+			</div>
 		</div>
-		<div class="cellDiv">
-			<button ng-model="currentNode.formatting.height" ng-click="makeTaller()" value="{currentNode.formatting.height}">Up</button>
-		</div>
-		<div class="cellDiv"><a class="applySibiling" href="" ng-click="applyHeightToSibilings()">Apply to sibilings</a>
+
+		<div layout="row" flex="25" class="green" layout-align="center center">
+			<div flex>
+				<span>
+				<md-button class="btn btn-xs mdbutton" ng-click="applyFormattingToSibilings(currentNode, 'height', true)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+				<md-tooltip>
+        			Apply to sibilings within same box
+      			</md-tooltip>
+				</md-button></span>
+				<span><md-button class="btn btn-xs mdbutton" ng-click="applyFormattingToSibilings(currentNode, 'height', false)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+				<md-tooltip>
+        			Apply to sibilings across all boxes
+      			</md-tooltip>
+				</md-button></span>
+			</div>
+
 		</div>
 	</div>
-	<div class="rowDiv">
-		<div class="cellDiv">Width</div>
-		<div class="cellDiv">
+	<div id="width" flex layout="row" layout-align="space-around" class="tabrow green" ng-show="showControls">
+		<div class="green" flex="50" layout-align="center center">
+			Width:
 			<input ng-model="currentNode.formatting.width" value="{currentNode.formatting.width}" type="number">
 		</div>
-		<div class="cellDiv">
-			<button ng-model="currentNode.formatting.width" ng-click="makeLessLong()" value="{currentNode.formatting.width}">Down</button>
+		<div flex="25" class="green" layout-align="center center">
+			<div flex>
+			<span flex>
+				<md-button class="mdbutton" ng-model="currentNode.formatting.width" ng-click="makeLonger()" value="{currentNode.formatting.width}">
+					<md-icon md-svg-src="{{ getIcon('up.svg') }}"  class="s24" alt="Up"></md-icon>
+					<md-tooltip>
+        				Increase width by 20 pixels
+      				</md-tooltip>
+				</md-button>
+			</span>
+			<span flex>
+				<md-button class="mdbutton" ng-model="currentNode.formatting.width" ng-click="makeLessLong()" value="{currentNode.formatting.width}">
+					<md-icon md-svg-src="{{ getIcon('down.svg') }}"  class="s24" alt="Down"></md-icon>
+					<md-tooltip>
+        				Decrease width by 20 pixels
+      				</md-tooltip>
+				</md-button>
+			</span>
+			</div>
 		</div>
-		<div class="cellDiv">
-			<button ng-model="currentNode.formatting.width" ng-click="makeLonger()" value="{currentNode.formatting.width}">Up</button>
+
+		<div layout="row" flex="25" class="green" layout-align="center center">
+			<div flex>
+				<span>
+				<md-button class="btn btn-xs mdbutton" ng-click="applyFormattingToSibilings(currentNode, 'width', true)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+				<md-tooltip>
+        			Apply to sibilings within same box
+      			</md-tooltip>
+				</md-button></span>
+				<span><md-button class="btn btn-xs mdbutton" ng-click="applyFormattingToSibilings(currentNode, 'width', false)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+				<md-tooltip>
+        			Apply to sibilings across all boxes
+      			</md-tooltip>
+				</md-button></span>
+			</div>
+
 		</div>
-		<div class="cellDiv"><a class="applySibiling" href="" ng-click="applyWidthToSibilings()">Apply to sibilings</a>
+	</div>
+	<div id="fillcolor" flex layout="row" layout-align="space-around" class="tabrow green" ng-show="showControls">
+		<div class="green" flex="50" layout-align="center center">
+			Fill color:
+			<input id=color colorpicker ng-model="currentNode.formatting.fill" type="text" >
+		</div>
+		<div flex="25" class="green" layout-align="center center">
+			<div flex></div>
+		</div>
+
+		<div layout="row" flex="25" class="green" layout-align="center center">
+			<div flex>
+				<span>
+				<md-button class="btn btn-xs mdbutton" ng-click="applyFormattingToSibilings(currentNode, 'fill', true)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+				<md-tooltip>
+        			Apply to sibilings within same box
+      			</md-tooltip>
+				</md-button></span>
+				<span><md-button class="btn btn-xs mdbutton" ng-click="applyFormattingToSibilings(currentNode, 'fill', false)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+				<md-tooltip>
+        			Apply to sibilings across all boxes
+      			</md-tooltip>
+				</md-button></span>
+			</div>
+
+		</div>
+	</div>
+	<div id="fillopacity" flex layout="row" layout-align="space-around" class="tabrow green" ng-show="showControls">
+		<div class="green" flex="50" layout-align="center center">
+			Fill opacity:
+			<input id=fillopacity ng-model="currentNode.formatting.fillOpacity" type="number" min='0' max='1' step='0.1' >
+		</div>
+		<div flex="25" class="green" layout-align="center center">
+			<div flex>
+			<span flex>
+				<md-button class="mdbutton" ng-model="currentNode.formatting.fillOpacity" ng-click="increaseOpacity()" value="{currentNode.formatting.fillOpacity}">
+					<md-icon md-svg-src="{{ getIcon('up.svg') }}"  class="s24" alt="Up"></md-icon>
+					<md-tooltip>
+        				Increase border size
+      				</md-tooltip>
+				</md-button>
+			</span>
+			<span flex>
+				<md-button class="mdbutton" ng-model="currentNode.formatting.fillOpacity" ng-click="decreaseOpacity()" value="{currentNode.formatting.fillOpacity}">
+					<md-icon md-svg-src="{{ getIcon('down.svg') }}"  class="s24" alt="Down"></md-icon>
+					<md-tooltip>
+        				Decrease border size
+      				</md-tooltip>
+				</md-button>
+			</span>
+			</div>
+		</div>
+
+		<div layout="row" flex="25" class="green" layout-align="center center">
+			<div flex>
+				<span>
+				<md-button class="btn btn-xs mdbutton" ng-click="applyFormattingToSibilings(currentNode, 'fillOpacity', true)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+				<md-tooltip>
+        			Apply to sibilings within same box
+      			</md-tooltip>
+				</md-button></span>
+				<span><md-button class="btn btn-xs mdbutton" ng-click="applyFormattingToSibilings(currentNode, 'fillOpacity', false)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+				<md-tooltip>
+        			Apply to sibilings across all boxes
+      			</md-tooltip>
+				</md-button></span>
+			</div>
+
+		</div>
+	</div>
+	<div id="borderThickness" flex layout="row" layout-align="space-around" class="tabrow green" ng-show="showControls">
+		<div class="green" flex="50" layout-align="center center">
+			Border size:
+			<input id=borderinput ng-model="currentNode.formatting.strokeWidth" type="number" min='0' max='30' step='1' >
+		</div>
+		<div flex="25" class="green" layout-align="center center">
+			<div flex>
+			<span flex>
+				<md-button class="mdbutton" ng-model="currentNode.formatting.strokeWidth" ng-click="makeStrokeThicker()" value="{currentNode.formatting.strokeWidth}">
+					<md-icon md-svg-src="{{ getIcon('up.svg') }}"  class="s24" alt="Up"></md-icon>
+					<md-tooltip>
+        				Increase border size
+      				</md-tooltip>
+				</md-button>
+			</span>
+			<span flex>
+				<md-button class="mdbutton" ng-model="currentNode.formatting.strokeWidth" ng-click="makeStrokeThinner()" value="{currentNode.formatting.strokeWidth}">
+					<md-icon md-svg-src="{{ getIcon('down.svg') }}"  class="s24" alt="Down"></md-icon>
+					<md-tooltip>
+        				Decrease border size
+      				</md-tooltip>
+				</md-button>
+			</span>
+			</div>
+		</div>
+
+		<div layout="row" flex="25" class="green" layout-align="center center">
+			<div flex>
+				<span>
+				<md-button class="btn btn-xs mdbutton" ng-click="applyFormattingToSibilings(currentNode, 'strokeWidth', true)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+				<md-tooltip>
+        			Apply to sibilings within same box
+      			</md-tooltip>
+				</md-button></span>
+				<span><md-button class="btn btn-xs mdbutton" ng-click="applyFormattingToSibilings(currentNode, 'strokeWidth', false)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+				<md-tooltip>
+        			Apply to sibilings across all boxes
+      			</md-tooltip>
+				</md-button></span>
+			</div>
+
+		</div>
+	</div>
+	<div id="font" flex layout="row" layout-align="space-around" class="tabrow green" ng-show="showControls">
+		<div class="green" flex="50" layout-align="center center">
+			Font:
+			<select class="field" id=font ng-model="currentNode.formatting.fontFamily" ng-options="ft as ft for ft in ['Verdana', 'Calibri', 'Arial', 'Avant Garde', 'Impact']"></select>
+		</div>
+		<div flex="25" class="green" layout-align="center center">
+			<div flex>
+			</div>
+		</div>
+
+		<div layout="row" flex="25" class="green" layout-align="center center">
+			<div flex>
+				<span>
+				<md-button class="btn btn-xs mdbutton" ng-click="applyFormattingToSibilings(currentNode, 'fontFamily', true)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+				<md-tooltip>
+        			Apply to sibilings within same box
+      			</md-tooltip>
+				</md-button></span>
+				<span><md-button class="btn btn-xs mdbutton" ng-click="applyFormattingToSibilings(currentNode, 'fontFamily', false)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+				<md-tooltip>
+        			Apply to sibilings across all boxes
+      			</md-tooltip>
+				</md-button></span>
+			</div>
+		</div>
+	</div>
+	<div id="fontsize" flex layout="row" layout-align="space-around" class="tabrow green" ng-show="showControls">
+		<div class="green" flex="50" layout-align="center center">
+			Font size:
+			<input id=fontsizeinput ng-model="currentNode.formatting.fontSize" type="number" min='5' max='60' step='1' >
+		</div>
+		<div flex="25" class="green" layout-align="center center">
+			<div flex>
+			<span flex>
+				<md-button class="mdbutton" ng-model="currentNode.formatting.fontSize" ng-click="increaseFontSize()" value="{currentNode.formatting.fontSize}">
+					<md-icon md-svg-src="{{ getIcon('up.svg') }}"  class="s24" alt="Up"></md-icon>
+					<md-tooltip>
+        				Increase font size
+      				</md-tooltip>
+				</md-button>
+			</span>
+			<span flex>
+				<md-button class="mdbutton" ng-model="currentNode.formatting.fontSize" ng-click="decreaseFontSize()" value="{currentNode.formatting.fontSize}">
+					<md-icon md-svg-src="{{ getIcon('down.svg') }}"  class="s24" alt="Down"></md-icon>
+					<md-tooltip>
+        				Decrease font size
+      				</md-tooltip>
+				</md-button>
+			</span>
+			</div>
+		</div>
+
+		<div layout="row" flex="25" class="green" layout-align="center center">
+			<div flex>
+				<span>
+				<md-button class="btn btn-xs mdbutton" ng-click="applyFormattingToSibilings(currentNode, 'fontSize', true)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+				<md-tooltip>
+        			Apply to sibilings within same box
+      			</md-tooltip>
+				</md-button></span>
+				<span><md-button class="btn btn-xs mdbutton" ng-click="applyFormattingToSibilings(currentNode, 'fontSize', false)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+				<md-tooltip>
+        			Apply to sibilings across all boxes
+      			</md-tooltip>
+				</md-button></span>
+			</div>
+
+		</div>
+	</div>
+	<div id="fontcolor" flex layout="row" layout-align="space-around" class="tabrow green" ng-show="showControls">
+		<div class="green" flex="50" layout-align="center center">
+			Font color:
+			<input id=fontcolorinput colorpicker ng-model="currentNode.formatting.fontColor" type="text" >
+		</div>
+		<div flex="25" class="green" layout-align="center center">
+			<div flex></div>
+		</div>
+
+		<div layout="row" flex="25" class="green" layout-align="center center">
+			<div flex>
+				<span>
+				<md-button class="btn btn-xs mdbutton" ng-click="applyFormattingToSibilings(currentNode, 'fontColor', true)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+				<md-tooltip>
+        			Apply to sibilings within same box
+      			</md-tooltip>
+				</md-button></span>
+				<span><md-button class="btn btn-xs mdbutton" ng-click="applyFormattingToSibilings(currentNode, 'fontColor', false)"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+				<md-tooltip>
+        			Apply to sibilings across all boxes
+      			</md-tooltip>
+				</md-button></span>
+			</div>
+
+		</div>
+	</div>
+	<div id="linebreak" flex layout="row" layout-align="space-around" class="tabrow green" ng-show="showControls">
+		<div class="center" flex>
+			<md-button class="md-fab md-primary md-button md-default-theme" ng-click="addNewLineBreak(false)">
+				<md-icon md-svg-src="{{ getIcon('linebreak.svg') }}"  class="s24" alt="Line break next"></md-icon>
+			</md-button>
+		</div>
+		<div class="center" flex>
+			<md-button class="md-fab md-primary md-button md-default-theme" ng-click="addNewLineBreak(true)" >
+				<md-icon md-svg-src="{{ getIcon('linebreak.svg') }}"  class="s24" alt="Line break inside"></md-icon>
+			</md-button>
 		</div>
 	</div>
 
-	<div class="rowDiv">
-		<div class="cellDiv">Font</div>
-		<div class="cellDiv">
-			<select class="field" id=font ng-model="currentNode.formatting.fontFamily" ng-options="ft as ft for ft in ['Verdana', 'Calibri', 'Arial', 'Avant Garde', 'Impact']"></select>
-		</div>
-		<div class="cellDiv">&nbsp;</div>
-		<div class="cellDiv">&nbsp;</div>
-		<div class="cellDiv"><a class="applySibiling" href="" ng-click="alert('not implemented')">Apply to sibilings</a>
-		</div>
-	</div>
-	<div class="rowDiv">
-		<div class="cellDiv">Font size</div>
-		<div class="cellDiv">
-			<select id=fontSize ng-model="currentNode.formatting.fontSize" ng-options="ftSize as ftSize for ftSize in [6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]"></select>
-		</div>
-		<div class="cellDiv">
-			<button ng-model="currentNode.formatting.fontSize" ng-click="decreaseFontSize()" value="{currentNode.formatting.fontSize}">Down</button>
-		</div>
-		<div class="cellDiv">
-			<button ng-model="currentNode.formatting.fontSize" ng-click="increaseFontSize()" value="{currentNode.formatting.fontSize}">Up</button>
-		</div>
-		<div class="cellDiv applySibiling">apply to sibilings</div>
-	</div>
-	<div class="rowDiv">
-		<div class="cellDiv">Font color</div>
-		<div class="cellDiv">
-			<input id=fontColor colorpicker ng-model="currentNode.formatting.fontColor" type="text">
-		</div>
-		<div class="cellDiv">&nbsp;</div>
-		<div class="cellDiv">&nbsp;</div>
-		<div class="cellDiv applySibiling">apply to sibilings</div>
-	</div>
-	<div class="rowDiv">
-		<div class="cellDiv">Fill color</div>
-		<div class="cellDiv">
-			<input id=color colorpicker ng-model="currentNode.formatting.fill" type="text">
-		</div>
-		<div class="cellDiv">&nbsp;</div>
-		<div class="cellDiv">&nbsp;</div>
-		<div class="cellDiv"><a href="" ng-click="applyFillColorToSibilings(currentNode)">Apply to sibilings</a>
-		</div>
-	</div>
-	<div class="rowDiv">
-		<div class="cellDiv">Fill opacity</div>
-		<div class="cellDiv">
-			<input id=fillopacity ng-model="currentNode.formatting.fillOpacity" type="number" min='0' max='1' step='0.1'>
-		</div>
-		<div class="cellDiv">&nbsp;</div>
-		<div class="cellDiv">&nbsp;</div>
-		<div class="cellDiv"><a href="" ng-click="applyFillOpacityToSibilings()">Apply to sibilings</a>
-		</div>
-	</div>
-	<div class="rowDiv">
-		<div class="cellDiv">Shape</div>
-		<div class="cellDiv">
-			<select id=shape ng-model="currentNode.formatting.showas" ng-options="shape as shape for shape in shapes"></select>
-		</div>
-		<div class="cellDiv">&nbsp;</div>
-		<div class="cellDiv">&nbsp;</div>
-		<div class="cellDiv applySibiling">apply to sibilings</div>
-	</div>
-	<div class="rowDiv">
-		<div class="cellDiv">Border size</div>
-		<div class="cellDiv">
-			<select id=borderThickness ng-model="currentNode.formatting.strokeWidth" ng-options="nbr as nbr for nbr in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]"></select>
-		</div>
-		<div class="cellDiv">
-			<button ng-model="currentNode.formatting.strokeWidth" ng-click="makeStrokeThinner()" value="{currentNode.formatting.strokeWidth}">Down</button>
-		</div>
-		<div class="cellDiv">
-			<button ng-model="currentNode.formatting.strokeWidth" ng-click="makeStrokeThicker()" value="{currentNode.formatting.strokeWidth}">Up</button>
-		</div>
-		<div class="cellDiv"><a href="" ng-click="applyFormattingToSibilings(currentNode, 'strokeWidth')">Apply to sibilings</a>
-		</div>
-	</div>
-	<div class="rowDiv">
-		<div class="cellDiv">
-			<button ng-click="addNewNode(this)">New node</button>
-		</div>
-		<div class="cellDiv">
-			<button ng-click="newSubItem(this, fileIndex)" value="currentNode" ng-model="currentNode">New child</button>
-		</div>
-		<div class="cellDiv">
-			<button ng-click="deleteNode()" value="currentNode" ng-model="currentNode">Delete Node</button>
-		</div>
-		<div class="cellDiv">&nbsp;</div>
-		<div class="cellDiv">&nbsp;</div>
-	</div>
+	
+	
+	<!--<div class="containerDiv">-->
+	<!--	<div class="rowDiv">-->
+	<!--		<div class="cellDiv">Line break formatting</div>-->
+	<!--	</div>-->
+	<!--</div>-->
+	<!--<div class="containerDiv">-->
+	<!--	<div class="rowDiv">-->
+	<!--		<div class="cellDiv">-->
+	<!--			<button class="btn-xs" ng-click="addNewLineBreak(false)" value="currentNode" ng-model="currentNode">Add line break next</button>-->
+	<!--		</div>-->
+	<!--		<div class="cellDiv">-->
+	<!--			<button class="btn-xs" ng-click="addNewLineBreak(true)" value="currentNode" ng-model="currentNode">Add line break inside</button>-->
+	<!--		</div>-->
+	<!--	</div>-->
 </div>
-<div class="containerDiv">
-	<div class="rowDiv">
-		<div class="cellDiv">Line break formatting</div>
-	</div>
-</div>
-<div class="containerDiv">
-	<div class="rowDiv">
-		<div class="cellDiv">
-			<button ng-click="addNewLineBreak(false)" value="currentNode" ng-model="currentNode">Add line break next</button>
-		</div>
-		<div class="cellDiv">
-			<button ng-click="addNewLineBreak(true)" value="currentNode" ng-model="currentNode">Add line break inside</button>
-		</div>
-	</div>
-</div>
+
+	<!--	<div class="rowDiv">-->
+	<!--		<div class="cellDiv">Shape</div>-->
+	<!--		<div class="cellDiv">-->
+	<!--			<select id=shape ng-model="currentNode.formatting.showas" ng-options="shape as shape for shape in shapes"></select>-->
+	<!--		</div>-->
+	<!--		<div class="cellDiv">&nbsp;</div>-->
+	<!--		<div class="cellDiv">&nbsp;</div>-->
+	<!--		<div class="cellDiv applySibiling">apply to sibilings</div>-->
+	<!--	</div>-->

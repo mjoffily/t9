@@ -77,18 +77,24 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 	// traverse all nodes. Along the way find the selected one and mark it "nodeselected = true". 
 	// mark the other nodes with "nodeselected = false"
 	// this variable is used to highlight on the screen the node clicked on, both on the diagram and on the node tree.
-	$scope.findNode = function(id) {
+	$scope.findNode = function(id, apply) {
 		
 		for (var i = 0; i < $scope.flatNodesForSelectedFile.length; i++) {
 			$scope.flatNodesForSelectedFile[i].formatting.nodeselected = false;
 		}
 		$scope.currentNode = $scope.flatIndexedNodesForSelectedFile[id].node;
 		$scope.currentNode.formatting.nodeselected = true;
-		$scope.$apply();
+		if (apply) {
+			$scope.$apply();
+		}
+	};
+
+	$scope.findNodeInMap = function(id) {
+		return $scope.flatIndexedNodesForSelectedFile[id].node;
 	};
 
 
-	$scope.goToPage = function(idx) {
+	$scope.goToFile = function(idx) {
 		if (idx === "-1") {
 			$scope.newFile();
 			return;
@@ -105,16 +111,20 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 	$scope.newFile = function() {
 		var a = {
 			"envId": 1,
+			"maxId": 0,
 			"envName": "unnamed",
 			"nodes": []
 		};
 		var dataArrayLength = $scope.data.push(a);
-
-		// set this as the current file
-		$scope.setCurrentFile(dataArrayLength - 1);
+		var idx = dataArrayLength - 1;
+		
 		$scope.dataflat.push({
-			flatnodes: []
+			flatnodes: [],
+			flatindexedNodes: []
 		});
+		// set this as the current file
+		$scope.setCurrentFile(idx);
+		$scope.goToFile(idx);
 	};
 
 	$scope.getNextId = function() {
@@ -124,30 +134,77 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 		return id;
 	};
 
-	$scope.addNewNode = function() {
+	$scope.getNewNode = function() {
+		var id = $scope.getNextId(); 
 		var a = {
-			id: $scope.getNextId(),
+			id: id,
 			type: 'node',
-			title: 'new entry',
+			title: id + '',
 			formatting: {
 				strokeWidth: 2,
 				width: 100,
 				height: 100,
+				fillOpacity: 1.0,
+				visible: true,
 				showas: 'rectangle',
 				borderColor: 'black',
 				fill: '#B19CD8',
-				fontFamily: 'Verdana, Geneva, sans-serif',
+				fontFamily: 'Verdana',
 				fontColor: '#FFFFFF',
+				textStrokeWidth: 0,
 				fontSize: 10,
 				level: 0
 			},
 			metadata: [],
 			children: []
 		};
+		return a;
+	};
+	
+	$scope.addNewNodeAsSibiling = function() {
+		// add node as a sibiling to the selected node
+		if ($scope.currentNode) {
+			var a = $scope.getNewNode();
+			
+			// inherit characteristics of currently selected node
+			a.formatting.strokeWidth = $scope.currentNode.formatting.strokeWidth;
+			a.formatting.width       = $scope.currentNode.formatting.width;
+			a.formatting.height = $scope.currentNode.formatting.height;
+			a.formatting.showas = $scope.currentNode.formatting.showas;
+			a.formatting.borderColor = $scope.currentNode.formatting.borderColor;
+			a.formatting.fill	 = $scope.currentNode.formatting.fill;
+			a.formatting.fontFamily	 = $scope.currentNode.formatting.fontFamily;
+			a.formatting.fontColor	 = $scope.currentNode.formatting.fontColor;
+			a.formatting.textStrokeWidth	 = $scope.currentNode.formatting.textStrokeWidth;
+			a.formatting.fontSize	 = $scope.currentNode.formatting.fontSize;
+			a.formatting.level	 = $scope.currentNode.formatting.level;
+	
+			
+			// find parent of selected node
+			var parent = $scope.getParent($scope.currentNode.id);
+			if (parent) { // find the position of the selected node under the parent and move the new node as a sibiling
+				var pos = $scope.findNodeInArray($scope.currentNode.id, parent.children); 
+				parent.children.splice(pos + 1, 0, a);
+				$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[a.id] = {node: a, parent: parent};
+
+			} else { // no parent - add node to top of tree next to selected node
+				pos = $scope.findNodeInArray($scope.currentNode.id, $scope.data[$scope.selectedFileIndex].nodes); 
+				$scope.data[$scope.selectedFileIndex].nodes.splice(pos + 1, 0, a);
+				$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[a.id] = {node: a, parent: undefined};
+			}
+			$scope.dataflat[$scope.selectedFileIndex].flatnodes.push(a);
+			$scope.findNode(a.id, false);
+		} else {
+			$scope.addNewNode();
+		}
+	};
+	
+	$scope.addNewNode = function() {
+		var a = $scope.getNewNode();
 		$scope.data[$scope.selectedFileIndex].nodes.splice(0, 0, a);
-		$scope.dataflat[$scope.selectedFileIndex].flatnodes.push(a);
 		$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[a.id] = {node: a, parent: undefined};
-		$scope.findNode(a.id);
+		$scope.dataflat[$scope.selectedFileIndex].flatnodes.push(a);
+		$scope.findNode(a.id, false);
 	};
 
 	$scope.deleteNode = function() {
@@ -178,15 +235,15 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 		for (var i = 0; i < arr.length; i++) { 
 			if (arr[i].children.length > 0) {
 				$scope.deleteChildren(arr[i].children);
-			} else {
-				for (var j = 0; j < $scope.dataflat[$scope.selectedFileIndex].flatnodes.length; j++) {
-					if ($scope.dataflat[$scope.selectedFileIndex].flatnodes[j].id === arr[i].id) {
-						$scope.dataflat[$scope.selectedFileIndex].flatnodes.splice(j, 1);
-						break;
-					}
+			} 
+			
+			for (var j = 0; j < $scope.dataflat[$scope.selectedFileIndex].flatnodes.length; j++) {
+				if ($scope.dataflat[$scope.selectedFileIndex].flatnodes[j].id === arr[i].id) {
+					$scope.dataflat[$scope.selectedFileIndex].flatnodes.splice(j, 1);
+					break;
 				}
-				$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[arr[i].id] = {};
 			}
+			$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[arr[i].id] = {};
 		}
 	}
 
@@ -241,19 +298,23 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 
 	$scope.newSubItem = function(scope, idx) {
 		var parentNode = $scope.currentNode;
+		var id = $scope.getNextId();
 		var newNode = {
-			id: $scope.getNextId(),
+			id: id,
 			type: parentNode.type,
-			title: parentNode.title + '.' + (parentNode.children.length + 1),
+			title: id + '',
 			formatting: {
 				strokeWidth: 2,
 				showas: 'rectangle',
 				borderColor: 'black',
+				visible: true,
 				width: 0,
 				height: 0,
+				fillOpacity: 1.0,
 				fill: '#B19CD8',
-				fontFamily: 'Verdana, Geneva, sans-serif',
+				fontFamily: 'Verdana',
 				fontColor: '#FFFFFF',
+				textStrokeWidth: 0,
 				fontSize: 10,
 				level: parentNode.formatting.level + 1
 			},
