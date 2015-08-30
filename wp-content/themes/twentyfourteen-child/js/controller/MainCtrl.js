@@ -36,7 +36,7 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 	// $scope.linkToParent = function(objArr, parentObj) {
 	// 	for (var i = 0; i < objArr.length; i++) {
 	// 		var node = objArr[i];
-	// 		$scope.dataflat[$scope.selectedFileIndex].flatnodes[node.id].parent = parentObj;
+	// 		$scope.flatNodesForSelectedFile[node.id].parent = parentObj;
 	// 		if (node.children.length > 0) {
 	// 			$scope.linkToParent(node.children, node);
 	// 		}
@@ -48,7 +48,7 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 	}
 
 	// lets traverse the tree structure to flatten it and store the parent of each node for easy access
-	// We cannot have add the parent to the tree object as it causes stack overflow
+	// We cannot add the parent to the tree object as it causes stack overflow
 	// when transforming to json and on angular $digest cycle
 	// We will use this flat array when dragging and dropping objects and changing parents and
 	// sibilings.
@@ -70,8 +70,6 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 		$scope.selectedFileIndex = idx;
 		$scope.flatNodesForSelectedFile = $scope.dataflat[$scope.selectedFileIndex].flatnodes;
 		$scope.flatIndexedNodesForSelectedFile = $scope.dataflat[$scope.selectedFileIndex].flatindexedNodes;
-
-//		$scope.linkToParent($scope.currentFile.nodes, undefined);
 	};
 
 	// traverse all nodes. Along the way find the selected one and mark it "nodeselected = true". 
@@ -185,14 +183,14 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 			if (parent) { // find the position of the selected node under the parent and move the new node as a sibiling
 				var pos = $scope.findNodeInArray($scope.currentNode.id, parent.children); 
 				parent.children.splice(pos + 1, 0, a);
-				$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[a.id] = {node: a, parent: parent};
+				$scope.flatIndexedNodesForSelectedFile[a.id] = {node: a, parent: parent};
 
 			} else { // no parent - add node to top of tree next to selected node
 				pos = $scope.findNodeInArray($scope.currentNode.id, $scope.data[$scope.selectedFileIndex].nodes); 
 				$scope.data[$scope.selectedFileIndex].nodes.splice(pos + 1, 0, a);
-				$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[a.id] = {node: a, parent: undefined};
+				$scope.flatIndexedNodesForSelectedFile[a.id] = {node: a, parent: undefined};
 			}
-			$scope.dataflat[$scope.selectedFileIndex].flatnodes.push(a);
+			$scope.flatNodesForSelectedFile.push(a);
 			$scope.findNode(a.id, false);
 		} else {
 			$scope.addNewNode();
@@ -202,8 +200,8 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 	$scope.addNewNode = function() {
 		var a = $scope.getNewNode();
 		$scope.data[$scope.selectedFileIndex].nodes.splice(0, 0, a);
-		$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[a.id] = {node: a, parent: undefined};
-		$scope.dataflat[$scope.selectedFileIndex].flatnodes.push(a);
+		$scope.flatIndexedNodesForSelectedFile[a.id] = {node: a, parent: undefined};
+		$scope.flatNodesForSelectedFile.push(a);
 		$scope.findNode(a.id, false);
 	};
 
@@ -215,14 +213,14 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 		for (var i = 0; i < arr.length; i++) { // delete from tree array and from flat and flat indexed arrays too
 			if (arr[i].id === id) {
 				$scope.deleteChildren(arr[i].children);
-				for (var j = 0; j < $scope.dataflat[$scope.selectedFileIndex].flatnodes.length; j++) {
-					if ($scope.dataflat[$scope.selectedFileIndex].flatnodes[j].id === arr[i].id) {
-						$scope.dataflat[$scope.selectedFileIndex].flatnodes.splice(j, 1);
+				for (var j = 0; j < $scope.flatNodesForSelectedFile.length; j++) {
+					if ($scope.flatNodesForSelectedFile[j].id === arr[i].id) {
+						$scope.flatNodesForSelectedFile.splice(j, 1);
 						break;
 					}
 				}
 				
-				$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[arr[i].id] = {};
+				$scope.flatIndexedNodesForSelectedFile[arr[i].id] = {};
 				arr.splice(i, 1);
 				break;
 			} else if (arr[i].children.length > 0) {
@@ -237,18 +235,18 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 				$scope.deleteChildren(arr[i].children);
 			} 
 			
-			for (var j = 0; j < $scope.dataflat[$scope.selectedFileIndex].flatnodes.length; j++) {
-				if ($scope.dataflat[$scope.selectedFileIndex].flatnodes[j].id === arr[i].id) {
-					$scope.dataflat[$scope.selectedFileIndex].flatnodes.splice(j, 1);
+			for (var j = 0; j < $scope.flatNodesForSelectedFile.length; j++) {
+				if ($scope.flatNodesForSelectedFile[j].id === arr[i].id) {
+					$scope.flatNodesForSelectedFile.splice(j, 1);
 					break;
 				}
 			}
-			$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[arr[i].id] = {};
+			$scope.flatIndexedNodesForSelectedFile[arr[i].id] = {};
 		}
 	}
 
 	$scope.getParent = function(nodeId) {
-		return $scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[nodeId].parent
+		return $scope.flatIndexedNodesForSelectedFile[nodeId].parent
 	} 
 	
 	$scope.findNodeInArray = function(nodeId, arr) {
@@ -279,21 +277,21 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 		// 
 		if (isInside) { // user has requested a linebreak inside the currentnode
 			$scope.currentNode.children.push(a);
-			$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[a.id] = {node: a, parent: $scope.currentNode};
+			$scope.flatIndexedNodesForSelectedFile[a.id] = {node: a, parent: $scope.currentNode};
 		} else { // user has requested a linebreak as sibiling of currentnode
 			var parent = $scope.getParent($scope.currentNode.id);
 			if (parent) { // if has parent, add the line break to the children array, next to current node
 				var pos = $scope.findNodeInArray($scope.currentNode.id, parent.children);
 				parent.children.splice(pos + 1, 0, a);
-				$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[a.id] = {node: a, parent: parent};
+				$scope.flatIndexedNodesForSelectedFile[a.id] = {node: a, parent: parent};
 			} else { // does not have a parent. find the current Node at the top level array and add line break next
 				pos = $scope.findNodeInArray($scope.currentNode.id, $scope.data[$scope.selectedFileIndex].nodes);
 				$scope.data[$scope.selectedFileIndex].nodes.splice(pos + 1, 0, a);
-				$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[a.id] = {node: a, parent: undefined};
+				$scope.flatIndexedNodesForSelectedFile[a.id] = {node: a, parent: undefined};
 			}
 		}
 		// push to the end of flat nodes
-		$scope.dataflat[$scope.selectedFileIndex].flatnodes.push(a);
+		$scope.flatNodesForSelectedFile.push(a);
 	};
 
 	$scope.newSubItem = function(scope, idx) {
@@ -322,8 +320,8 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 			children: []
 		};
 		parentNode.children.push(newNode);
-		$scope.dataflat[$scope.selectedFileIndex].flatnodes.push(newNode);
-		$scope.dataflat[$scope.selectedFileIndex].flatindexedNodes[newNode.id] = {node: newNode, parent: parentNode};
+		$scope.flatNodesForSelectedFile.push(newNode);
+		$scope.flatIndexedNodesForSelectedFile[newNode.id] = {node: newNode, parent: parentNode};
 
 	};
 }]);

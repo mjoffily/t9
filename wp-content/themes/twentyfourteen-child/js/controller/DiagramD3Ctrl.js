@@ -92,6 +92,10 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 			if (node.children.length > 0) {
 				$scope.recurseNodes(node.children, level + 1);
 			}
+			// initialize the array as it starts being populated from the highest level (index)
+			// eg, if there are 5 levels in the structure, index 4 will be the first one to be populated with references.
+			// Subsequently, the shallower levels get populated.
+			// In other words, bottom up
 			if ($scope.referencesPerLevel.length === 0 || typeof $scope.referencesPerLevel[level] === 'undefined') {
 				for (var i = 0; i <= level; i++) {
 					if (typeof $scope.referencesPerLevel[i] === 'undefined') {
@@ -138,6 +142,32 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 					if ($scope.file[i].type === 'node') {
 						setter($scope.file[i], valueToApply);
 					}
+				}
+			}
+		}
+	}
+
+	$scope.applyFormattingToSibilingsNew = function(currentNode, field, sameParentOnly) {
+
+		if (!sameParentOnly) {
+			$scope.buildReferencesToNodesPerLevel();
+			var nodesAtTheSameLevel = $scope.referencesPerLevel[currentNode.formatting.level];
+			for (var i = 0; i < nodesAtTheSameLevel.length; i++) {
+				if (nodesAtTheSameLevel[i].type === 'node') {
+					nodesAtTheSameLevel[i].formatting[field] = currentNode.formatting[field];
+				}
+			}
+		} else {
+			var parent = $scope.getParent($scope.currentNode.id)
+			var siblings = $scope.file;
+
+			if (parent && parent.children.length > 0) {
+				siblings = parent.children;
+			} 
+
+			for (var i = 0; i < siblings.length; i++) {
+				if (siblings[i].type === 'node') {
+					siblings[i].formatting = $scope.currentNode.formatting[field];
 				}
 			}
 		}
