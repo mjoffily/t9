@@ -33,16 +33,6 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 		}
 	};
 
-	// $scope.linkToParent = function(objArr, parentObj) {
-	// 	for (var i = 0; i < objArr.length; i++) {
-	// 		var node = objArr[i];
-	// 		$scope.flatNodesForSelectedFile[node.id].parent = parentObj;
-	// 		if (node.children.length > 0) {
-	// 			$scope.linkToParent(node.children, node);
-	// 		}
-	// 	}
-	// }
-
 	$scope.save = function() {
 		localStorage.t9 = JSON.stringify($scope.data);
 	}
@@ -206,7 +196,48 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 	};
 
 	$scope.deleteNode = function() {
+		// find the node that should become the "current" once the current 
+		// is deleted
+		var node = $scope.findSibiling($scope.currentNode.id, -1);
+		if (!node) {
+			node = $scope.findSibiling($scope.currentNode.id, 1);
+		}
+		if (!node) {
+			node = $scope.getParent($scope.currentNode.id);
+		}
 		$scope.delete($scope.currentNode.id, $scope.data[$scope.selectedFileIndex].nodes);
+		if (node) {
+			$scope.currentNode = node; 
+		} else {
+			$scope.currentNode = undefined;
+		}
+	}
+
+	/*
+	 * leftRightChoice can be 1 or -1.
+	 * 1 will return sibiling to the right in the array
+	 * -1 will return sibiling to the left in the array
+	 * if no sibiling exists, returns null
+	*/
+	$scope.findSibiling = function(nodeId, leftRightChoice) {
+		var parent = $scope.getParent(nodeId);
+		var pos = -1;
+		var arr = [];
+		if (parent) {
+			arr = parent.children;
+		} else {
+			arr = $scope.currentFile.nodes;
+		}
+		// if there is only this node in the array, it has no sibilings
+		if (arr.length === 1) {
+			return null;
+		}
+		pos = $scope.findNodeInArray(nodeId, arr);
+		// if no sibiling to the left and no sibiling to the right return null
+		if ((pos === 0 && leftRightChoice === -1) || (pos === (arr.length - 1) && leftRightChoice === 1)) {
+			return null;
+		} 
+		return arr[pos + leftRightChoice];
 	}
 	
 	$scope.delete = function(id, arr) {
@@ -288,6 +319,12 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 				pos = $scope.findNodeInArray($scope.currentNode.id, $scope.data[$scope.selectedFileIndex].nodes);
 				$scope.data[$scope.selectedFileIndex].nodes.splice(pos + 1, 0, a);
 				$scope.flatIndexedNodesForSelectedFile[a.id] = {node: a, parent: undefined};
+			}
+			// update currentNode to force redraw
+			if ($scope.currentNode.dummyField) {
+				$scope.currentNode.dummyField = $scope.currentNode.dummyField + 1;
+			} else {
+				$scope.currentNode.dummyField = $scope.currentNode.dummyField = 0;
 			}
 		}
 		// push to the end of flat nodes

@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('t9', ['colorpicker.module', 'xeditable', 'ui.router']);
+var app = angular.module('t9', ['colorpicker.module', 'xeditable', 'ui.router', 'ngMaterial', 'ui.bootstrap']);
 
 app.run(function($rootScope, $state) {
     $rootScope.$state = $state;    

@@ -14,13 +14,16 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      '/home/ubuntu/workspace/wp-content/themes/twentyfourteen-child/js/_lib/angular.js',
+      '/home/ubuntu/workspace/unit-tests/js/lib/bower_components/angular/angular.js',
       '/home/ubuntu/workspace/unit-tests/js/lib/bower_components/angular-mocks/angular-mocks.js',
       '/home/ubuntu/workspace/unit-tests/js/lib/bower_components/angular-resource/angular-resource.js',
       '/home/ubuntu/workspace/unit-tests/js/lib/bower_components/angular-material/angular-material.js',
+      '/home/ubuntu/workspace/unit-tests/js/lib/bower_components/angular-animate/angular-animate.js',
+      '/home/ubuntu/workspace/unit-tests/js/lib/bower_components/angular-aria/angular-aria.js',
       '/home/ubuntu/workspace/unit-tests/js/t9Spec.js',
       '/home/ubuntu/workspace/unit-tests/js/DiagramD3Spec.js',
       '/home/ubuntu/workspace/wp-content/themes/twentyfourteen-child/js/_lib/bootstrap-colorpicker-module.js',
+      '/home/ubuntu/workspace/wp-content/themes/twentyfourteen-child/js/_lib/ui-bootstrap-tpls-0.12.0.js',
       '/home/ubuntu/workspace/wp-content/themes/twentyfourteen-child/js/_lib/xeditable.js',
       '/home/ubuntu/workspace/wp-content/themes/twentyfourteen-child/js/_lib/angular-ui-router.js',
       '/home/ubuntu/workspace/wp-content/themes/twentyfourteen-child/js/_lib/d3.js',

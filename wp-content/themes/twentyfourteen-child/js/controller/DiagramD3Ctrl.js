@@ -12,6 +12,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 	$scope.topPadding = 30;
 	$scope.editorEnabled = false;
 	$scope.showJson = false;
+	$scope.undoStack = new Array();
 	$scope.showOutline = false;
 	$scope.showControls = true;
 	$scope.propertiesTemplate = SiteParameters.theme_directory + '/js/partials/popup.html';
@@ -314,6 +315,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 	$scope.removeDraggedObjectFromCurrentLocation = function(d) {
 		var parent = $scope.flatIndexedNodesForSelectedFile[d.id].parent;
 		if (parent) {
+			// find the object in the array of children
 			for (var i = 0; i < parent.children.length; i++) {
 				if (parent.children[i].id === d.id) { // we found the object being dragged
 					parent.children.splice(i, 1); // remove the node from the parent array
@@ -458,10 +460,9 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		if ($scope.dragdrophelper.threshold.isNeeded) {
 			if ($scope.dragdrophelper.threshold.min.x > currentPosition.mousex || $scope.dragdrophelper.threshold.min.y > currentPosition.mousey || $scope.dragdrophelper.threshold.max.x < currentPosition.mousex || $scope.dragdrophelper.threshold.max.y < currentPosition.mousey) {
 				$scope.dragdrophelper.threshold.isNeeded = false;
-
-				b.style("opacity", 0.5);
-			}
-			else {
+				console.log("opacity to 0.5");
+				//b.style("opacity", 0.5);
+			} else {
 				return;
 			}
 		}
@@ -876,9 +877,14 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		});
 	};
 
+	$scope.undo = function() {
+		
+	}
 
-	$scope.$watch("file", function(newValue, oldValue) {
+	$scope.$watch("currentNode", function(newValue, oldValue) {
+		// add to undo stack
 		if (!$scope.draggingInProgress) {
+			$scope.undoStack.push(oldValue);
 			$scope.draw();
 		}
 	}, true);

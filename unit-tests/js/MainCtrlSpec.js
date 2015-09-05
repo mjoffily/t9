@@ -2,19 +2,15 @@ var SiteParameters = {
     theme_directory: 'test'
 };
 
-describe("DiagramD3Ctrl", function() {
+describe("MainCtrl", function() {
     var $scope;
     var $rootScope;
     var t9Service;
     var $controller;
     var $stateParams;
-    var diagramCtrl;
-    var $parse;
-    var $mdSidenav;
-    var $log;
-    var titleWithMapFilter;
-    var attributeNameFilter;
-    var attributeValueFilter;
+    var $state;
+    var $q;
+    var ctrl;
     var data;
 
     beforeEach(function() {
@@ -26,11 +22,8 @@ describe("DiagramD3Ctrl", function() {
             $rootScope = $injector.get('$rootScope');
             $scope = $rootScope.$new();
             t9Service = $injector.get('t9Service');
-            $parse = $injector.get('$parse');
-            $mdSidenav = {}; // mock this out
-            $log = $injector.get('$log');
-            titleWithMapFilter = $injector.get('titleWithMapFilter');
-            attributeNameFilter = $injector.get('attributeNameFilter');
+            $state = $injector.get('$state');
+            $q = $injector.get('$q');
             $controller = $injector.get('$controller');
             $stateParams = {
                 idx: 0
@@ -39,24 +32,27 @@ describe("DiagramD3Ctrl", function() {
             $scope.data[$stateParams.idx] = {
                 nodes: []
             };
-            diagramCtrl = $controller('diagramCtrl', {
+            ctrl = $controller('diagramCtrl', {
                 $scope: $scope,
-                '$parse': $parse,
-                '$stateParams': $stateParams,
-                '$mdSidenav': $mdSidenav,
-                '$log': $log,
                 't9Service': t9Service,
-                'titleWithMapFilter': titleWithMapFilter,
-                'attributeNameFilter': attributeNameFilter,
-                'attributeValueFilter': attributeValueFilter
+                '$state': $state,
+                '$stateParams': $stateParams,
+                '$q': $q
             });
         });
     });
 
-    it('intitialization of variables', function() {
-        expect($scope.tops).toEqual(0);
+    it('deleteNode - currentNode is set to sibling to the left if it exists', function() {
         expect($scope.file).toBeDefined();
-    }); 
+    });
+
+    it('deleteNode - currentNode is set to sibling to the right if to the left does not exist', function() {
+        expect($scope.file).toBeDefined();
+    });
+
+    it('deleteNode - currentNode is set to parent if no sibilings exist', function() {
+        expect($scope.file).toBeDefined();
+    });
 
     describe('function buildReferencesToNodesPerLevel', function() {
         beforeEach(function() {
@@ -70,7 +66,7 @@ describe("DiagramD3Ctrl", function() {
                             children: []
                         }]
                     }]
-                }] 
+                }]
             };
             diagramCtrl = $controller('diagramCtrl', {
                 $scope: $scope,
@@ -90,5 +86,5 @@ describe("DiagramD3Ctrl", function() {
             expect($scope.referencesPerLevel).toBeDefined();
             expect($scope.referencesPerLevel.length).toBe(3);
         });
-    });
+    }); 
 });

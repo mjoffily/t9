@@ -29,12 +29,12 @@ function t9_scripts() {
    wp_enqueue_script( 'angular-script', "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular.min.js");
    wp_enqueue_script( 'angular-animate', "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-animate.min.js");
    wp_enqueue_script( 'angular-aria', "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-aria.min.js");
-   wp_enqueue_script( 'angular-material', "https://ajax.googleapis.com/ajax/libs/angular_material/0.8.2/angular-material.min.js");
+   wp_enqueue_script( 'angular-material', "https://ajax.googleapis.com/ajax/libs/angular_material/0.8.2/angular-material.js");
     
     //wp_enqueue_script( 'angular-script', get_stylesheet_directory_uri() . '/js/_lib/angular.js');
 //    wp_enqueue_script( 'angularUi-script', get_stylesheet_directory_uri() . '/js/_lib/angular-ui-tree.js');
     wp_enqueue_script( 'angular-ui-router-script', get_stylesheet_directory_uri() . '/js/_lib/angular-ui-router.js');
-    wp_enqueue_script( 'angular-ui-bootstrap-script', get_stylesheet_directory_uri() . '/js/_lib/ui-bootstrap-tpls-0.12.0.min.js');
+    wp_enqueue_script( 'angular-ui-bootstrap-script', get_stylesheet_directory_uri() . '/js/_lib/ui-bootstrap-tpls-0.12.0.js');
 //    wp_enqueue_script( 'fabric-script', get_stylesheet_directory_uri() . '/js/_lib/fabric.js');
     wp_enqueue_script( 'colorpicker-script', get_stylesheet_directory_uri() . '/js/_lib/bootstrap-colorpicker-module.min.js');
 //    wp_enqueue_script( 'ngDialog-script', get_stylesheet_directory_uri() . '/js/_lib/ngDialog.js');
