@@ -34,7 +34,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 	$scope.holder = []; // holdings list of overlapping objects during drag event
 	$scope.draggingInProgress = false; // flag to prevent redrawing when draggring is in progress
 	$scope.referencesPerLevel = [];
-	$scope.file = $scope.data[$stateParams.idx].nodes;
+	$scope.file = $scope.currentFile.nodes;
 	$scope.dragdrophelper = {
 		initial: {},
 		threshold: {
@@ -222,7 +222,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 	};
 
 
-	$scope.draw = function draw() {
+	$scope.draw = function() {
 		// calculate the width and height and x coordinate for all elements
 		for (var i = 0; i < $scope.file.length; i++) {
 			var node = $scope.file[i];
@@ -660,8 +660,8 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 
 			if (line > 0) {
 				// if the line break is the very first node, it does not have sibilings 2 positions before
-				if (siblings[elemIndex - 2]) {
-					yOfPreviousLine = siblings[elemIndex - 2].formatting.y;
+				if (siblings[elemIndex - 1]) {
+					yOfPreviousLine = siblings[elemIndex - 1].formatting.y;
 				}
 				else {
 					yOfPreviousLine = 0;
@@ -719,7 +719,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		}
 	};
 
-	$scope.sumWidth = function sumWidth(elemIdx, elem, children, elemPeers) {
+	$scope.sumWidth = function(elemIdx, elem, children, elemPeers) {
 
 		var widthPerLine = [0];
 		var idx = 0;
@@ -793,7 +793,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		}
 	};
 
-	$scope.sumHeight = function sumHeight(elemIdx, elem, children, elemPeers) {
+	$scope.sumHeight = function(elemIdx, elem, children, elemPeers) {
 		var heightPerLine = [0];
 		var idx = 0;
 		elem.formatting.y = 0;
@@ -869,7 +869,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		}
 	};
 
-	$scope.print = function print(data, level) {
+	$scope.print = function(data, level) {
 		level++;
 		data.forEach(function(elem) {
 			console.log(level + ' ' + elem.title + ' ' + elem.formatting.width + ' height: ' + elem.formatting.height);

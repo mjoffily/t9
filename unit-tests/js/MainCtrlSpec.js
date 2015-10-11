@@ -39,10 +39,26 @@ describe("MainCtrl", function() {
                 '$stateParams': $stateParams,
                 '$q': $q
             });
+            
+            $scope.data[$stateParams.idx] = {
+                nodes: [{
+                    id: 1,
+                    children: [{
+                        id: 2,
+                        children: [{
+                            id: 3,
+                            children: []
+                        }]
+                    }]
+                }]
+            };
+
         });
     });
 
     it('deleteNode - currentNode is set to sibling to the left if it exists', function() {
+        $scope.currentNode = 
+        $scope.deleteNode();
         expect($scope.file).toBeDefined();
     });
 

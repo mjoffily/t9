@@ -96,6 +96,11 @@ describe("t9 application test suite", function() {
             });
         })
         
+        afterEach(inject(function($httpBackend) {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        }));
+
         it('deleteNode - currentNode is set to sibling to the left if it exists', inject(function($httpBackend) {
             $httpBackend.whenGET("test/js/partials/main-view.html").respond({ hello: 'World' });
             //expect a get request to "internalapi/quotes"
@@ -164,6 +169,11 @@ describe("t9 application test suite", function() {
                 '$q': $q
             });
         })
+
+        afterEach(inject(function($httpBackend) {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        }));
         
         it('deleteNode - currentNode is set to sibling to the left if it exists', inject(function($httpBackend) {
             $httpBackend.whenGET("test/js/partials/main-view.html").respond({ hello: 'World' });

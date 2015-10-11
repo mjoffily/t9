@@ -1,9 +1,16 @@
-app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q', function($scope, t9Service, $state, $stateParams, $q) {
+/* global app*/
+/* global SiteParameters*/
+
+app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q', '$modal', '$log', function($scope, t9Service, $state, $stateParams, $q, $modal, $log) {
 	$scope.currentFile;
 	$scope.selectedFileIndex;
 	$scope.currentNode;
 	$scope.flatNodesForSelectedFile = [];
 	$scope.flatIndexedNodesForSelectedFile = [];
+	$scope.user = 'mjoffily';
+	$scope.serverRootLocation = SiteParameters.theme_directory;
+	$scope.fileList;
+	$scope.loading = false;
 
 	$scope.checkAndHandleLocalStorageResult = function(result) {
 		if (result.data !== "no data") {
@@ -14,27 +21,40 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 		return t9Service.getDataFromServer();
 	};
 
-	var p1 = t9Service.getDataFromLocalStorage();
-	var p2 = p1.then($scope.checkAndHandleLocalStorageResult);
-	p2.then(function(response) {
-		$scope.data = response.data;
-		// array to hold the data in a flat format
-		$scope.dataflat = new Array($scope.data.length);
-		$scope.flattenFiles($scope.data);
+//	var p1 = t9Service.getDataFromLocalStorage();
+	$scope.loading = true;
+	var p1 = t9Service.getListOfFilesFromServer($scope.user);
+	p1.then(function(result) {
+		$scope.fileList = result.data.files;
+	}).finally(function() {
+		$scope.loading = false;
 	});
 
-	$scope.flattenFiles = function(arr) {
-		for (var i = 0; i < arr.length; i++) {
-			$scope.dataflat[i] = {
-				flatnodes: [],
-				flatindexedNodes: []
-			};
-			$scope.flattenNodes($scope.dataflat[i], arr[i].nodes, undefined);
-		}
+	
+	// p2.then(function(response) {
+	// 	$scope.data = response.data;
+	// 	// array to hold the data in a flat format
+	// 	$scope.dataflat = new Array($scope.data.length);
+	// 	$scope.flattenFiles($scope.data);
+	// });
+
+	$scope.flattenFile = function(nodes, parent) {
+		$scope.dataflat = {
+			flatnodes: [],
+			flatindexedNodes: []
+		};
+		$scope.flattenNodes($scope.dataflat, nodes, undefined);
 	};
 
 	$scope.save = function() {
-		localStorage.t9 = JSON.stringify($scope.data);
+		$scope.loading = true;
+		var promise = t9Service.fileSave($scope.user, $scope.currentFile);
+		promise.then(function(res) {
+			$scope.currentFile.id = res.data.file_id;
+		}).finally(function() {
+			$scope.loading = false;
+		});
+//localStorage.t9 = JSON.stringify($scope.data);
 	}
 
 	// lets traverse the tree structure to flatten it and store the parent of each node for easy access
@@ -42,16 +62,14 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 	// when transforming to json and on angular $digest cycle
 	// We will use this flat array when dragging and dropping objects and changing parents and
 	// sibilings.
-	$scope.flattenNodes = function(destinationArray, sourceArray, parent) {
-		for (var j = 0; j < sourceArray.length; j++) {
-			var node = sourceArray[j];
-			destinationArray.flatindexedNodes[node.id] = {node: node, parent: parent};
-//			if (node.type === 'node') {
-				destinationArray.flatnodes.push(node);
-				if (node.children.length > 0) {
-					$scope.flattenNodes(destinationArray, node.children, node);
-				}
-//			}
+	$scope.flattenNodes = function(flatArray, nodes, parent) {
+		for (var j = 0; j < nodes.length; j++) {
+			var node = nodes[j];
+			flatArray.flatindexedNodes[node.id] = {node: node, parent: parent};
+			flatArray.flatnodes.push(node);
+			if (node.children.length > 0) {
+				$scope.flattenNodes(flatArray, node.children, node);
+			}
 		}
 	}
 
@@ -82,43 +100,46 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 	};
 
 
-	$scope.goToFile = function(idx) {
-		if (idx === "-1") {
-			$scope.newFile();
-			return;
-		}
+	$scope.fileOpen = function(idx) {
 		if (idx === "") {
 			return;
 		}
-		$scope.setCurrentFile(idx);
-		$state.go('home.file.diagram', {
-			idx: idx
+		$scope.loading = true;
+		var promise = t9Service.fileOpen($scope.user, $scope.fileList[idx].id);
+		promise.then(function(result) {
+			$scope.currentFile = result.data;
+			$scope.flattenFile($scope.currentFile.nodes, undefined);
+			$scope.flatNodesForSelectedFile = $scope.dataflat.flatnodes;
+			$scope.flatIndexedNodesForSelectedFile = $scope.dataflat.flatindexedNodes;
+			$state.go('home.file.diagram', {
+				idx: idx
+			});
+		}).finally(function() {
+			$scope.loading = false;
 		});
 	};
 
 	$scope.newFile = function() {
 		var a = {
-			"envId": 1,
-			"maxId": 0,
-			"envName": "unnamed",
+			"id": -1,
+			"max_node_id": 0,
+			"file_name": "unnamed",
 			"nodes": []
 		};
-		var dataArrayLength = $scope.data.push(a);
-		var idx = dataArrayLength - 1;
 		
-		$scope.dataflat.push({
-			flatnodes: [],
-			flatindexedNodes: []
-		});
 		// set this as the current file
-		$scope.setCurrentFile(idx);
-		$scope.goToFile(idx);
+		$scope.currentFile = a;
+
+		$scope.flattenFile($scope.currentFile.nodes, undefined);
+		$state.go('home.file.diagram', {
+			idx: -1
+		});
 	};
 
 	$scope.getNextId = function() {
-		var id = $scope.data[$scope.selectedFileIndex].maxId;
-		id = id + 1;
-		$scope.data[$scope.selectedFileIndex].maxId = id;
+		var id = $scope.currentFile.max_node_id;
+		id = +id + +1;
+		$scope.currentFile.max_node_id = id;
 		return id;
 	};
 
@@ -176,8 +197,8 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 				$scope.flatIndexedNodesForSelectedFile[a.id] = {node: a, parent: parent};
 
 			} else { // no parent - add node to top of tree next to selected node
-				pos = $scope.findNodeInArray($scope.currentNode.id, $scope.data[$scope.selectedFileIndex].nodes); 
-				$scope.data[$scope.selectedFileIndex].nodes.splice(pos + 1, 0, a);
+				pos = $scope.findNodeInArray($scope.currentNode.id, $scope.currentFile.nodes); 
+				$scope.currentFile.nodes.splice(pos + 1, 0, a);
 				$scope.flatIndexedNodesForSelectedFile[a.id] = {node: a, parent: undefined};
 			}
 			$scope.flatNodesForSelectedFile.push(a);
@@ -189,7 +210,7 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 	
 	$scope.addNewNode = function() {
 		var a = $scope.getNewNode();
-		$scope.data[$scope.selectedFileIndex].nodes.splice(0, 0, a);
+		$scope.currentFile.nodes.splice(0, 0, a);
 		$scope.flatIndexedNodesForSelectedFile[a.id] = {node: a, parent: undefined};
 		$scope.flatNodesForSelectedFile.push(a);
 		$scope.findNode(a.id, false);
@@ -197,7 +218,10 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 
 	$scope.deleteNode = function() {
 		// find the node that should become the "current" once the current 
-		// is deleted
+		// is deleted. Use this precedence rule:
+		// 1. sibiling to the left
+		// 2. sibiling to the right
+		// 3. parent node
 		var node = $scope.findSibiling($scope.currentNode.id, -1);
 		if (!node) {
 			node = $scope.findSibiling($scope.currentNode.id, 1);
@@ -205,9 +229,10 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 		if (!node) {
 			node = $scope.getParent($scope.currentNode.id);
 		}
-		$scope.delete($scope.currentNode.id, $scope.data[$scope.selectedFileIndex].nodes);
+		$scope.delete($scope.currentNode.id, $scope.currentFile.nodes);
 		if (node) {
-			$scope.currentNode = node; 
+			$scope.currentNode = node
+			$scope.currentNode.formatting.nodeselected = true; 
 		} else {
 			$scope.currentNode = undefined;
 		}
@@ -316,8 +341,8 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 				parent.children.splice(pos + 1, 0, a);
 				$scope.flatIndexedNodesForSelectedFile[a.id] = {node: a, parent: parent};
 			} else { // does not have a parent. find the current Node at the top level array and add line break next
-				pos = $scope.findNodeInArray($scope.currentNode.id, $scope.data[$scope.selectedFileIndex].nodes);
-				$scope.data[$scope.selectedFileIndex].nodes.splice(pos + 1, 0, a);
+				pos = $scope.findNodeInArray($scope.currentNode.id, $scope.currentFile.nodes);
+				$scope.currentFile.nodes.splice(pos + 1, 0, a);
 				$scope.flatIndexedNodesForSelectedFile[a.id] = {node: a, parent: undefined};
 			}
 			// update currentNode to force redraw
@@ -361,4 +386,19 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 		$scope.flatIndexedNodesForSelectedFile[newNode.id] = {node: newNode, parent: parentNode};
 
 	};
+	$scope.login = function() {
+
+    var modalInstance = $modal.open({
+      templateUrl: 'loginn.html',
+      backdrop: false,
+      controller: 'loginCtrl'
+    });
+
+    modalInstance.result.then(function (selectedItem) {
+      $scope.selected = selectedItem;
+    }, function () {
+      $log.info('Modal dismissed at: ' + new Date());
+    });
+  };
+
 }]);

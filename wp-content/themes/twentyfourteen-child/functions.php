@@ -35,6 +35,7 @@ function t9_scripts() {
 //    wp_enqueue_script( 'angularUi-script', get_stylesheet_directory_uri() . '/js/_lib/angular-ui-tree.js');
     wp_enqueue_script( 'angular-ui-router-script', get_stylesheet_directory_uri() . '/js/_lib/angular-ui-router.js');
     wp_enqueue_script( 'angular-ui-bootstrap-script', get_stylesheet_directory_uri() . '/js/_lib/ui-bootstrap-tpls-0.12.0.js');
+    wp_enqueue_script( 'angular-modal-service-script', get_stylesheet_directory_uri() . '/js/_lib/angular-modal-service.js');
 //    wp_enqueue_script( 'fabric-script', get_stylesheet_directory_uri() . '/js/_lib/fabric.js');
     wp_enqueue_script( 'colorpicker-script', get_stylesheet_directory_uri() . '/js/_lib/bootstrap-colorpicker-module.min.js');
 //    wp_enqueue_script( 'ngDialog-script', get_stylesheet_directory_uri() . '/js/_lib/ngDialog.js');
@@ -46,6 +47,7 @@ function t9_scripts() {
     wp_enqueue_script( 'file-controller-script', get_stylesheet_directory_uri() . '/js/controller/FileCtrl.js');
     wp_enqueue_script( 'main-controller-script', get_stylesheet_directory_uri() . '/js/controller/MainCtrl.js');
     wp_enqueue_script( 'flat-view-controller-script', get_stylesheet_directory_uri() . '/js/controller/FlatViewCtrl.js');
+    wp_enqueue_script( 'login-controller-script', get_stylesheet_directory_uri() . '/js/controller/LoginCtrl.js');
     wp_enqueue_script( 'directives-script', get_stylesheet_directory_uri() . '/js/directives/directives.js');
     wp_enqueue_script( 'node-properties-directive-script', get_stylesheet_directory_uri() . '/js/directives/node-properties.js');
     

@@ -1,3 +1,6 @@
+/*global SiteParameters*/
+/*global app*/
+
 app.service('t9Service', ['$http', '$q', function($http, $q) {
 
   this.getDataFromLocalStorage = function() {
@@ -20,6 +23,53 @@ app.service('t9Service', ['$http', '$q', function($http, $q) {
       .success(function(response) {
         return response;
       });
+    return promise;
+  };
+
+  this.getListOfFilesFromServer = function(user) {
+    var obj = {};
+    obj.user = user;
+    var promise = $http({
+      method: "post",
+      url: SiteParameters.theme_directory + '/services/retrieve-file-list.php',
+      data: obj,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+    return promise;
+  };
+
+  this.fileOpen = function(user, fileId) {
+    var obj = {};
+    obj.user = user;
+    obj.id = fileId;
+    var promise = $http({
+      method: "post",
+      url: SiteParameters.theme_directory + '/services/file-open.php',
+      data: obj,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+    return promise;
+  };
+
+  this.fileSave = function(user, file) {
+    var obj = {};
+    obj.user = user;
+    obj.id = file.id;
+    obj.max_node_id = file.max_node_id;
+    obj.file_name = file.file_name;
+    obj.nodes = file.nodes;
+    var promise = $http({
+      method: "post",
+      url: SiteParameters.theme_directory + '/services/file-save.php',
+      data: obj,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
     return promise;
   };
 
