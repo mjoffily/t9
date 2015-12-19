@@ -2,12 +2,14 @@
 
 require_once 'database-connection.php';
 $postdata = file_get_contents("php://input");
-error_log($postdata);
 $request = json_decode($postdata);
+error_log($postdata);
+error_log($request);
 $userid = $request->user;
 $fileId = $request->id;
 $fileName = $request->file_name;
 $maxNodeId = $request->max_node_id;
+error_log($fileName);
 $nodes = json_encode($request->nodes);
 error_log($nodes);
 

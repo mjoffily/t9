@@ -1,8 +1,13 @@
+/* global app*/
+/* global SiteParameters*/
+/* global d3 */
+
 app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav', '$log', 't9Service', 'titleWithMapFilter', 'attributeNameFilter', 'attributeValueFilter', function($scope, $parse, $stateParams, $mdSidenav, $log, t9Service, titleWithMapFilter, attributeNameFilter, attributeValueFilter) {
 
 	$scope.groups = new Array();
 	$scope.tops = 0;
 	$scope.debugOn = false;
+	$scope.showTextSetter = false;
 	$scope.minWidth = 1;
 	$scope.minHeight = 1;
 	$scope.defaultWidth = 50;
@@ -221,7 +226,46 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		$scope.file.splice(0, 0, a);
 	};
 
+	$scope.doubleclick = function(d, i) {
+		var originalText = d.title;
+		var textSetterDiv = d3.select("#textSetter");
+		textSetterDiv.on("keydown", function() {
+			if (d3.event.keyCode === 13) {
+				d3.event.stopPropagation();
+				//alert(d3.event.keyCode + d.title);
+				// insert 2 br tags (if only one br tag is inserted the cursor won't go to the next line)
+				//document.execCommand('insertHTML', false, '<br>');
+				$scope.currentNode.title = textSetterDiv.html();
+				// prevent the default behaviour of return key pressed
+				d3.event.preventDefault();
+				$scope.showTextSetter = false;
+				$scope.$apply();
+			} else if (d3.event.keyCode === 27) { // escape
+				$scope.currentNode.title = originalText;
+				$scope.showTextSetter = false;
+				$scope.$apply();
+			} else {
+				$scope.currentNode.title = textSetterDiv.html();
+			}
+		})
 
+		var xx = d3.event.x;
+		var yy = d3.event.y;
+		
+		textSetterDiv.style({   left: xx + "px",
+					top: yy + "px"
+		});
+		textSetterDiv.html(d.title);
+		$scope.showTextSetter = true;
+		
+			// mousex: d3.mouse(this)[0],
+			// mousey: d3.mouse(this)[1],
+			// x: parseInt(d3.transform(a.attr("transform")).translate[0]),
+			// y: parseInt(d3.transform(a.attr("transform")).translate[1]),
+			// width: parseInt(a[0][0].children[0].width.baseVal.value),
+			// height: parseInt(a[0][0].children[0].height.baseVal.value)
+	};
+	
 	$scope.draw = function() {
 		// calculate the width and height and x coordinate for all elements
 		for (var i = 0; i < $scope.file.length; i++) {
@@ -292,18 +336,6 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 
 		console.log("current: %o, initial: %o, threshold: %o", currentPosition, $scope.dragdrophelper.initial, $scope.dragdrophelper.threshold);
 
-    // $scope.doneEditing = function (elem) {
-    //     if (! angular.element(elem.srcElement).hasClass('editable')) {
-    //         angular.forEach($scope.todos, function (key, value) {
-    //           key.editing = false;
-    //         });
-    //     }
-    // };
-
-		// flag to avoid redrawing while dragging is in progress
-		//$scope.draggingInProgress = true;
-		//d.formatting.originalx = d.formatting.x;
-		//d.formatting.originaly = d.formatting.y;
 		// initialise the holder of overlapping objects
 		$scope.holder = [];
 	}
@@ -480,15 +512,6 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		g.append('circle').attr('r', 16).style('fill', 'black')
 		g.append('circle').attr('r', 15).style('fill', 'lightblue');
 
-		//console.log(currentPosition);
-		//		a.transition().delay(50).style('opacity', 1);
-		//		a.style({
-		//			left: (currentPosition.x - $scope.dragdrophelper.offsetCircleCentre) + "px",
-		//			top: (currentPosition.y - $scope.dragdrophelper.offsetCircleCentre) + "px"
-		//		});
-
-
-
 		// initialise list of overlapping objects
 		$scope.holder = [];
 		$scope.findDragOver($scope.flatNodesForSelectedFile, currentPosition.mousex, currentPosition.mousey, true, $scope.holder, d);
@@ -531,8 +554,12 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 
 		g.on('click', function(d, i) {
 			$scope.findNode(d.id, true);
+			// make sure the div for setting text is made invisible
+			$scope.showTextSetter = false;
 		});
-
+		g.on("dblclick",function(d, i){ 
+			$scope.doubleclick(d, i);
+		});
 		g.transition().duration(1000).attr("transform", function(d) {
 			return "translate(" + [d.formatting.x, d.formatting.y] + ")";
 		})
@@ -719,6 +746,31 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		}
 	};
 
+
+	// this function operates on the currently selected node
+	$scope.snugIt = function() {
+		// if we don't have a selected note, nothing to do
+		if (!$scope.currentNode) {
+			return;
+		}
+		// if the selected node has no children, nothing to do
+		if (!$scope.currentNode.children || $scope.currentNode.children.length === 0) {
+			return;
+		}
+		
+		// make the width of the current node snuggle to its children
+		var idxOfLastChild = $scope.currentNode.children.length - 1;
+		var xOfLastChild = $scope.currentNode.children[idxOfLastChild].formatting.x;
+		var widthOfLastChild = $scope.currentNode.children[idxOfLastChild].formatting.width;
+		$scope.currentNode.formatting.width = xOfLastChild + widthOfLastChild + $scope.padding - $scope.currentNode.formatting.x;
+		
+		// make the height of the current node snuggle to its children
+		var yOfLastChild = $scope.currentNode.children[idxOfLastChild].formatting.y;
+		var heightOfLastChild = $scope.currentNode.children[idxOfLastChild].formatting.height;
+		$scope.currentNode.formatting.height = yOfLastChild + heightOfLastChild + $scope.padding - $scope.currentNode.formatting.y;
+		$scope.draw();
+	};
+
 	$scope.sumWidth = function(elemIdx, elem, children, elemPeers) {
 
 		var widthPerLine = [0];
@@ -750,6 +802,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 			var child = children[i];
 			var previousChildIdx = i - 1;
 
+			// this is a line break
 			if (children[previousChildIdx] && children[previousChildIdx].type === 'formatting') {
 				widthPerLine.push(0);
 				idx++;
