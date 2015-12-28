@@ -323,8 +323,8 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 			type: 'formatting',
 			title: 'linebreak',
 			formatting: {
-				height: 10,
-				width: 20
+				height: 0,
+				width: 0
 			},
 			children: []
 		};

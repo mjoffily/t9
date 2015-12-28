@@ -1,4 +1,4 @@
-<div layout="column" layout-fill>
+<div layout="column" layout-fill ng-controller="diagramCtrl">
 
   <div flex layout="row">
     <div flex-lg="50" flex-gt-lg="33" flex-md="50" layout="row" layout-align="start start">
@@ -17,16 +17,19 @@
   <!--<div node-properties template="filter.html" filter="filter" class="" id="filterpropertiesdiv"></div>-->
   <div node-properties class="" id="nodepropertiesdiv"></div>
   <div id="textSetter" ng-show="showTextSetter" contenteditable="true" style="position: fixed; width: 420px; left: 0px; top: 57px; border: solid; borderColor: black;">this is a text in a div</div>
+    <div><p ng-bind="showJson"></p></div>
 
   <section flex>
     <div flex layout="row">
-      <div flex="70">
-        <div ng-show="showJson">
+      <div flex="70"><div>SVG {{svgWidth}}</div>
+        <div ng-show="showJson"><p> {{showJson}}</p>
           <h3>Data binding</h3>
           <div class="info">
             {{info}}
           </div>
-          <pre class="code">{{ file | json }}</pre>
+          <pre class="code">{{ currentFile | json }}</pre>
+          <button ng-click='z(1)'>+</button>
+          <button ng-click='z(-1)'>-</button>
         </div>
         <div flex id="canvasDiv">
           <svg id="svg" width="1500" height="1500"></svg>

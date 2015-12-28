@@ -55,7 +55,65 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		},
 		offsetCircleCentre: 15
 	};
+	$scope.svgWidth = 1200;
+	$scope.svgHeight = 1200;
+	$scope.margin = {
+	    "top": 25,
+	    "right": 25,
+	    "bottom": 50,
+	    "left": 50
+	},
+	$scope.width = $scope.svgWidth - $scope.margin.left - $scope.margin.right,
+	$scope.height = $scope.svgHeight - $scope.margin.top - $scope.margin.bottom;
+	$scope.svgViewport = undefined;
+	$scope.xAxisScale = undefined;
+	$scope.yAxisScale = undefined;
+	$scope.xAxis = undefined;
+	$scope.yAxis = undefined;
 
+	$scope.svgViewport = d3.select("#svg")
+	  	.attr("width", $scope.width + $scope.margin.left + $scope.margin.right)
+	  	.attr("height", $scope.height + $scope.margin.top + $scope.margin.bottom)
+	  	.style("border", "2px ");
+	// Scales
+	$scope.xAxisScale = d3.scale.linear()
+	  .domain([0, $scope.width])
+	  .range([0, $scope.width]);
+	
+	$scope.yAxisScale = d3.scale.linear()
+	  .domain([0, $scope.height])
+	  .range([0, $scope.height]);
+	
+	// Axis Functions
+	$scope.xAxis = d3.svg.axis()
+	  .scale($scope.xAxisScale)
+	  .orient("top")
+	  .tickSize(-$scope.height);
+	
+	$scope.yAxis = d3.svg.axis()
+	  .scale($scope.yAxisScale)
+	  .orient("left")
+	  .tickSize(-$scope.width);
+	
+	// Inner Drawing Space
+	$scope.innerSpace = $scope.svgViewport.append("g")
+	  .attr("class", "inner_space")
+	  .attr("transform", "translate(" + $scope.margin.left + "," + $scope.margin.top + ")");
+
+	$scope.innerSpace.append("rect").attr("id", "overlay").attr("width", $scope.width).attr("height", $scope.height);
+	
+	// Draw Axis
+	$scope.innerSpace.append("g")
+	  .attr("class", "x axis")
+	  .attr("transform", "translate(0,0)")
+	  .call($scope.xAxis);
+	
+	$scope.innerSpace.append("g")
+	  .attr("class", "y axis")
+	  .call($scope.yAxis);
+	  	
+	$scope.gDrawingContainer = $scope.innerSpace.append("g");
+	
 	$scope.toggleRight = function() {
 		$mdSidenav('right').toggle()
 			.then(function() {
@@ -517,11 +575,97 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		$scope.findDragOver($scope.flatNodesForSelectedFile, currentPosition.mousex, currentPosition.mousey, true, $scope.holder, d);
 	};
 
+	$scope.zoomFunction = function() {
+	
+	  // Select All Circles
+	  var gContainers = $scope.innerSpace.selectAll(".groupclass");
+	  var rectangles = gContainers.selectAll("rect");
+	  var text = gContainers.selectAll("text");
+
+	  // Pan Vector
+	  //var panVector = d3.event.translate;
+//	  var panX = panVector[0];
+	  //var panY = panVector[1];
+	
+	  // Scaling Multiplier
+	  var scaleMultiplier = d3.event.scale;
+	
+	  // Redraw the Axis
+	  $scope.innerSpace.select(".x.axis").call($scope.xAxis);
+	  $scope.innerSpace.select(".y.axis").call($scope.yAxis);
+	
+	  // Redraw the Circle
+	  gContainers.attr("transform", function(d) {
+	    return "translate(" + [$scope.xAxisScale(d.formatting.x), $scope.yAxisScale(d.formatting.y)] + ")"
+	    + " scale(" + scaleMultiplier + ")";
+	  });
+	  //rectangles.attr("width", function(d, i) {
+	  //    return scaleMultiplier * d.formatting.width;
+	  //  })
+	  //  .attr("height", function(d, i) {
+	  //    return scaleMultiplier * d.formatting.height;
+	  //  })
+	    
+	  //  text.attr("x", function(d) {
+			// 	if (d.type !== 'formatting') {
+			// 		return (scaleMultiplier * d.formatting.width / 2);
+			// 	}
+			// 	else {
+			// 		return 0;
+			// 	}
+			// })
+			// .attr("y", function(d) {
+			// 	if (d.type !== 'formatting') {
+			// 		if (d.children.length > 0) {
+			// 			return $scope.textPadding
+			// 		}
+			// 		else {
+			// 			return (scaleMultiplier * d.formatting.height / 2);
+			// 		}
+			// 	} else {
+			// 		return 0;
+			// 	}
+			// });
+	
+	}
+
+	$scope.coordinates = function(point) {
+	  var scale = $scope.zoomBehaviour.scale(), translate = $scope.zoomBehaviour.translate();
+	  return [(point[0] - translate[0]) / scale, (point[1] - translate[1]) / scale];
+	}
+	
+	$scope.point = function(coordinates) {
+	  var scale = $scope.zoomBehaviour.scale(), translate = $scope.zoomBehaviour.translate();
+	  return [coordinates[0] * scale + translate[0], coordinates[1] * scale + translate[1]];
+	}
+
+	$scope.z = function(direction) {
+  		$scope.innerSpace.call($scope.zoomBehaviour.event); // https://github.com/mbostock/d3/issues/2387
+
+		// Record the coordinates (in data space) of the center (in screen space).
+		var center0 = $scope.zoomBehaviour.center();
+		var translate0 = $scope.zoomBehaviour.translate();
+		var coordinates0 = $scope.coordinates(center0);
+		//  zoom.scale(zoom.scale() * Math.pow(2, direction));
+		if (direction === 1) {
+			$scope.zoomBehaviour.scale($scope.zoomBehaviour.scale() * 1.2);
+		} else {
+		  $scope.zoomBehaviour.scale($scope.zoomBehaviour.scale() * 0.8);
+		}
+		
+		// Translate back to the center.
+		var center1 = $scope.point(coordinates0);
+		$scope.zoomBehaviour.translate([translate0[0] + center0[0] - center1[0], translate0[1] + center0[1] - center1[1]]);
+		
+		$scope.innerSpace.call($scope.zoomBehaviour.event);
+	}
+	
+
 	$scope.render = function() {
 
 		// sort the data so objects are drawn in the correct order
 
-		var g = d3.select("#svg").selectAll("g").data($scope.flatNodesForSelectedFile.filter(function(d) {
+		var g = $scope.gDrawingContainer.selectAll("g").data($scope.flatNodesForSelectedFile.filter(function(d) {
 			if ($scope.showOutline) {
 				return true; // if showing outline, show everything
 			}
@@ -567,6 +711,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 
 
 		g.selectAll("rect")
+			.attr("class", "drawing-rect")
 			.attr("id", function(d) {
 				return 'rect_' + d.id
 			})
@@ -609,7 +754,8 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 			.text(function(d) {
 				if ((d.type === 'node' && d.formatting.visible) || $scope.debugOn) {
 					if ($scope.debugOn) {
-						return ' (line:' + d.formatting.line + ')';
+//						return ' (line:' + d.formatting.line + ')';
+						return ' (width:' + d.formatting.width + ')';
 					}
 					return d.title;
 				}
@@ -651,10 +797,11 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 				return d.formatting.fontFamily;
 			})
 			.attr("font-size", function(d) {
-				return d.formatting.fontSize;
+//				return d.formatting.fontSize;
+				return "10px";
 			})
 			.attr("text-anchor", "middle");
-		g.call($scope.dragGroup);
+//		g.call($scope.dragGroup);
 
 		g.exit().remove();
 	};
@@ -780,8 +927,12 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		// set the x of the element to the right of the previous element or zero if brand new line
 		var previousElementIdx = elemIdx - 1;
 		if (elemIdx >= 1) {
-			if (elemPeers[previousElementIdx].type != 'formatting') {
-				elem.formatting.x = elemPeers[previousElementIdx].formatting.x + elemPeers[previousElementIdx].formatting.width + $scope.padding;
+			if (elemPeers[previousElementIdx].type !== 'formatting') {
+				if (elem.type !== 'formatting' || (elem.type === 'formatting' && $scope.showOutline)) {
+					elem.formatting.x = elemPeers[previousElementIdx].formatting.x + elemPeers[previousElementIdx].formatting.width + $scope.padding;
+				} else { // this is a line break and we are not showing the outline. 
+					elem.formatting.x = 0;
+				}
 			}
 			else if (parent) {
 				elem.formatting.x = parent.formatting.x + $scope.padding;
@@ -810,24 +961,34 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 
 			// initialize the x of the child element a bit to the right of the border of the elem.
 			// This will change further down if the element has sibillings.
-			child.formatting.x = elem.formatting.x + $scope.padding;
+			if (child.type !== 'formatting' || (child.type === 'formatting' && $scope.showOutline)) {
+				child.formatting.x = elem.formatting.x + $scope.padding;
 
-			// if the element has sibilling, offset the x taking into account the x of the sibilling
-			if (previousChildIdx >= 0) {
-				if (children[previousChildIdx].type != 'formatting') {
-					child.formatting.x = children[previousChildIdx].formatting.x + children[previousChildIdx].formatting.width + $scope.padding;
+				// if the element has sibilling, offset the x taking into account the x of the sibilling
+				if (previousChildIdx >= 0) {
+					if (children[previousChildIdx].type !== 'formatting') {
+						child.formatting.x = children[previousChildIdx].formatting.x + children[previousChildIdx].formatting.width + $scope.padding;
+					}
 				}
 			}
 
 			if (child.children.length > 0) {
 				$scope.sumWidth(i, child, child.children, children);
 			}
-			if (!child.formatting.width || child.formatting.width < $scope.minWidth) {
-				child.formatting.width = $scope.defaultWidth;
-			}
+			
+			// Set the width of the child. If it is a linebreak, set it to zero so we don't mess up the formatting
+			// Do that UNLESS it we want to show the outline, in which case, we give the linebreak a width so we can
+			// se it on the screen
+			if (child.type === 'formatting' && !$scope.showOutline) {
+					child.formatting.width = 0;
+			} else {
+				if (!child.formatting.width || child.formatting.width < $scope.minWidth) {
+					child.formatting.width = $scope.defaultWidth;
+				}
 
-			// save width for the current line
-			widthPerLine[idx] = widthPerLine[idx] + child.formatting.width + $scope.padding;
+				// save width for the current line
+				widthPerLine[idx] = widthPerLine[idx] + child.formatting.width + $scope.padding;
+			}
 		};
 
 		// Sort the line widths so we can get the heighest number. The width of the elem must be  
@@ -836,13 +997,17 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 			return a - b
 		});
 
-		var minWidthCalc = widthPerLine[widthPerLine.length - 1] + ($scope.padding);
-		if (!elem.formatting.width || elem.formatting.width < minWidthCalc) {
-			elem.formatting.width = minWidthCalc;
-		}
-
-		if (elem.formatting.width < $scope.minWidth) {
-			elem.formatting.width = $scope.minWidth;
+		if (elem.type === 'formatting' && !$scope.showOutline) {
+			elem.formatting.width = 0;
+		} else {
+			var minWidthCalc = widthPerLine[widthPerLine.length - 1];
+			if (!elem.formatting.width || elem.formatting.width < minWidthCalc) {
+				elem.formatting.width = minWidthCalc;
+			}
+	
+			if (elem.formatting.width < $scope.minWidth) {
+				elem.formatting.width = $scope.minWidth;
+			}
 		}
 	};
 
@@ -1194,6 +1359,15 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		.on("dragend", $scope.dragend)
 		.on("drag", $scope.dragmove);
 
+	$scope.zoomBehaviour = d3.behavior.zoom()
+	  .x($scope.xAxisScale)
+	  .y($scope.yAxisScale)
+	  .center([$scope.width / 2, $scope.height / 2])
+	  .scaleExtent([0.2, 10])
+	  .on("zoom", $scope.zoomFunction);
+
+	$scope.innerSpace.call($scope.zoomBehaviour);
+	  
 	// d3.select("#canvasDiv")
 	//   .on("touchstart", function() {
 	//   	$scope.dragstart.bind(this, 5)();

@@ -322,4 +322,18 @@ circle {
  .center {
   text-align: center;
  }
- 
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #fff;
+}
+
+svg {
+  font: 10px sans-serif;
+  shape-rendering: crispEdges;
+}
+
+#overlay {
+  fill: #ddd;
+}
