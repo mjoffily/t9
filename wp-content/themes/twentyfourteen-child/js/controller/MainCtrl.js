@@ -14,7 +14,8 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 	$scope.debugOn = false;
 	$scope.showJson = false;
 	$scope.showOutline = false;
-
+	$scope.undoStack = [];
+	
 	$scope.checkAndHandleLocalStorageResult = function(result) {
 		if (result.data !== "no data") {
 			var deferred = $q.defer();
@@ -120,15 +121,19 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 				$scope.currentFile.svg_height = 1200;
 			}
 			
-			$scope.flattenFile($scope.currentFile.nodes, undefined);
-			$scope.flatNodesForSelectedFile = $scope.dataflat.flatnodes;
-			$scope.flatIndexedNodesForSelectedFile = $scope.dataflat.flatindexedNodes;
+			$scope.flatten();
 			$state.go('home.file.diagram', {
 				idx: idx
 			});
 		}).finally(function() {
 			$scope.loading = false;
 		});
+	};
+	
+	$scope.flatten = function() {
+		$scope.flattenFile($scope.currentFile.nodes, undefined);
+		$scope.flatNodesForSelectedFile = $scope.dataflat.flatnodes;
+		$scope.flatIndexedNodesForSelectedFile = $scope.dataflat.flatindexedNodes;
 	};
 
 	$scope.newFile = function() {
@@ -182,12 +187,26 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 		return a;
 	};
 	
+	$scope.addToUndoStack = function(description) {
+		var undoObj = {"description": description};
+		undoObj.nodes = JSON.parse(JSON.stringify($scope.currentFile.nodes));
+		$scope.undoStack.push(undoObj);
+	};
+	
+	$scope.undo = function() {
+		var undoObj = $scope.undoStack.pop();
+		$scope.currentFile.nodes = JSON.parse(JSON.stringify(undoObj.nodes));
+		$scope.flatten();
+		$scope.$broadcast ('undo');
+	};
+	
 	$scope.addNewNodeAsSibiling = function() {
 
-		// copy nodes to undo stack before making the change
-		$scope.undoStack.push(JSON.parse(JSON.stringify($scope.currentFile.nodes)));
 		// add node as a sibiling to the selected node
 		if ($scope.currentNode) {
+			// copy nodes to undo stack before making the change
+			$scope.addToUndoStack("add new node as sibiling");
+
 			var a = $scope.getNewNode();
 			
 			// inherit characteristics of currently selected node
@@ -224,6 +243,9 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 	};
 	
 	$scope.addNewNode = function() {
+		// copy nodes to undo stack before making the change
+		$scope.addToUndoStack("add new node");
+
 		var a = $scope.getNewNode();
 		$scope.currentFile.nodes.splice(0, 0, a);
 		$scope.flatIndexedNodesForSelectedFile[a.id] = {node: a, parent: undefined};
@@ -232,6 +254,9 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 	};
 
 	$scope.deleteNode = function() {
+		// copy nodes to undo stack before making the change
+		$scope.addToUndoStack("delete node");
+
 		// find the node that should become the "current" once the current 
 		// is deleted. Use this precedence rule:
 		// 1. sibiling to the left
@@ -372,6 +397,9 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 	};
 
 	$scope.newSubItem = function(scope, idx) {
+		// copy nodes to undo stack before making the change
+		$scope.addToUndoStack("add new node as a child");
+
 		var parentNode = $scope.currentNode;
 		var id = $scope.getNextId();
 		var newNode = {

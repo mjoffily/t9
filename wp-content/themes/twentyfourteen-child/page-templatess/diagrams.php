@@ -15,6 +15,16 @@
          <li><a href='#'><span>Close</span></a></li>
       </ul>
    </li>
+   <li class='active has-sub'><a href='#'><span>Edit</span></a>
+      <ul>
+         <li class="has-sub"><a href='#'><span>Undo</span></a>
+            <ul>
+                <li ng-repeat="undoItem in undoStack track by $index" value="{{undoItem.description}}"><a href="" ng-click="undo()">{{undoItem.description}}</a></li>
+            </ul>
+        </li>
+         <li><a href='#'><span>Redo</span></a></li>
+      </ul>
+   </li>
    <li class='has-sub'><a href='#'><span>View</span></a>
         <ul>
            <li ng-class="{checkmark: showOutline}"><a href='' ng-click="toggleOutline()"><span>Show outline</span></a></li>

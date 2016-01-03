@@ -15,7 +15,6 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 	$scope.padding = 10;
 	$scope.topPadding = 30;
 	$scope.editorEnabled = false;
-	$scope.undoStack = new Array();
 	$scope.showControls = true;
 	$scope.propertiesTemplate = SiteParameters.theme_directory + '/js/partials/popup.html';
 	$scope.shapes = ['rectangle', 'circle', 'triangle', 'elipse'];
@@ -385,6 +384,12 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		$scope.draw();        
 	});
 	
+	$scope.$on('undo', function() {
+		$scope.file = $scope.currentFile.nodes;
+		$scope.gDrawingContainer.selectAll("*").remove();
+		$scope.draw();        
+	});
+	
 
 	$scope.touchstart = function(thresholdValue) {
 		$scope.dragstart(thresholdValue);
@@ -690,7 +695,6 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 	}
 	
 	$scope.render = function() {
-
 		// sort the data so objects are drawn in the correct order
 
 		var g = $scope.gDrawingContainer.selectAll("g").data($scope.flatNodesForSelectedFile.filter(function(d) {
@@ -935,6 +939,9 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 			return;
 		}
 		
+		// copy nodes to undo stack before making the change
+		$scope.addToUndoStack("snug it");
+
 		// make the width of the current node snuggle to its children
 		var idxOfLastChild = $scope.currentNode.children.length - 1;
 		var xOfLastChild = $scope.currentNode.children[idxOfLastChild].formatting.x;
@@ -1132,7 +1139,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 	$scope.$watch("currentNode", function(newValue, oldValue) {
 		// add to undo stack
 		if (!$scope.draggingInProgress) {
-			$scope.undoStack.push(oldValue);
+//			$scope.undoStack.push(oldValue);
 			$scope.draw();
 		}
 	}, true);
