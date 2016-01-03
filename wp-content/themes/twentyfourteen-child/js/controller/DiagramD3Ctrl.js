@@ -6,7 +6,6 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 
 	$scope.groups = new Array();
 	$scope.tops = 0;
-	$scope.debugOn = false;
 	$scope.showTextSetter = false;
 	$scope.minWidth = 1;
 	$scope.minHeight = 1;
@@ -16,9 +15,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 	$scope.padding = 10;
 	$scope.topPadding = 30;
 	$scope.editorEnabled = false;
-	$scope.showJson = false;
 	$scope.undoStack = new Array();
-	$scope.showOutline = false;
 	$scope.showControls = true;
 	$scope.propertiesTemplate = SiteParameters.theme_directory + '/js/partials/popup.html';
 	$scope.shapes = ['rectangle', 'circle', 'triangle', 'elipse'];
@@ -55,62 +52,82 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		},
 		offsetCircleCentre: 15
 	};
-	$scope.svgWidth = 1200;
-	$scope.svgHeight = 1200;
+	
+	$scope.panMode = true;
+	$scope.scaleMultiplier = 1;
 	$scope.margin = {
-	    "top": 25,
-	    "right": 25,
-	    "bottom": 50,
-	    "left": 50
-	},
-	$scope.width = $scope.svgWidth - $scope.margin.left - $scope.margin.right,
-	$scope.height = $scope.svgHeight - $scope.margin.top - $scope.margin.bottom;
-	$scope.svgViewport = undefined;
-	$scope.xAxisScale = undefined;
-	$scope.yAxisScale = undefined;
-	$scope.xAxis = undefined;
-	$scope.yAxis = undefined;
+		    "top": 10,
+		    "right": 10,
+		    "bottom": 10,
+		    "left": 10
+	};
+	
+	$scope.initSVG = function() {
+		$scope.svgWidth = $scope.currentFile.svg_width;
+		$scope.svgHeight = $scope.currentFile.svg_height;
+		
+		$scope.width = $scope.svgWidth - $scope.margin.left - $scope.margin.right,
+		$scope.height = $scope.svgHeight - $scope.margin.top - $scope.margin.bottom;
+	
+		$scope.svgViewport = d3.select("#svg")
+		  	.attr("width", $scope.width + $scope.margin.left + $scope.margin.right)
+		  	.attr("height", $scope.height + $scope.margin.top + $scope.margin.bottom)
+		  	.style("border", "2px ");
+		// Scales
+		$scope.xAxisScale = d3.scale.linear()
+		  .domain([0, $scope.width])
+		  .range([0, $scope.width]);
+		
+		$scope.yAxisScale = d3.scale.linear()
+		  .domain([0, $scope.height])
+		  .range([0, $scope.height]);
+		
+		// Axis Functions
+		$scope.xAxis = d3.svg.axis()
+		  .scale($scope.xAxisScale)
+		  .orient("top")
+		  .tickSize(-$scope.height);
+		
+		$scope.yAxis = d3.svg.axis()
+		  .scale($scope.yAxisScale)
+		  .orient("left")
+		  .tickSize(-$scope.width);
 
-	$scope.svgViewport = d3.select("#svg")
-	  	.attr("width", $scope.width + $scope.margin.left + $scope.margin.right)
-	  	.attr("height", $scope.height + $scope.margin.top + $scope.margin.bottom)
-	  	.style("border", "2px ");
-	// Scales
-	$scope.xAxisScale = d3.scale.linear()
-	  .domain([0, $scope.width])
-	  .range([0, $scope.width]);
+		$scope.innerSpace = $scope.svgViewport.selectAll(".inner_space").data([$scope.margin])
+			.attr("class", "inner_space")
+			.attr("transform", function(d) { return "translate(" + d.left + "," + d.top + ")" });
+
+//		$scope.innerSpace.selectAll("#overlay").attr("width", $scope.width).attr("height", $scope.height);		;
+		var gEnter = $scope.innerSpace.enter().append("g")
+			.attr("class", "inner_space")
+			.attr("transform", function(d) { 
+				return "translate(" + d.left + "," + d.top + ")" 
+			})
+		gEnter.append("rect").attr("id", "overlay");
+
+		gEnter.append("g")
+		  .attr("class", "x axis")
+		  .attr("transform", "translate(0,0)");
+		
+		gEnter.append("g")
+		  .attr("class", "y axis");
+
+		$scope.innerSpace.selectAll("#overlay").attr("width", $scope.width).attr("height", $scope.height);		
+		$scope.innerSpace.select(".x.axis").call($scope.xAxis);
+		$scope.innerSpace.select(".y.axis").call($scope.yAxis);
+
+	}
 	
-	$scope.yAxisScale = d3.scale.linear()
-	  .domain([0, $scope.height])
-	  .range([0, $scope.height]);
-	
-	// Axis Functions
-	$scope.xAxis = d3.svg.axis()
-	  .scale($scope.xAxisScale)
-	  .orient("top")
-	  .tickSize(-$scope.height);
-	
-	$scope.yAxis = d3.svg.axis()
-	  .scale($scope.yAxisScale)
-	  .orient("left")
-	  .tickSize(-$scope.width);
-	
+	// initialise the SVG
+	$scope.initSVG();
 	// Inner Drawing Space
-	$scope.innerSpace = $scope.svgViewport.append("g")
-	  .attr("class", "inner_space")
-	  .attr("transform", "translate(" + $scope.margin.left + "," + $scope.margin.top + ")");
+	// $scope.innerSpace = $scope.svgViewport.append("g")
+	//   .attr("class", "inner_space")
+	//   .attr("transform", "translate(" + $scope.margin.left + "," + $scope.margin.top + ")");
 
-	$scope.innerSpace.append("rect").attr("id", "overlay").attr("width", $scope.width).attr("height", $scope.height);
+	// $scope.innerSpace.append("rect").attr("id", "overlay").attr("width", $scope.width).attr("height", $scope.height);
 	
 	// Draw Axis
-	$scope.innerSpace.append("g")
-	  .attr("class", "x axis")
-	  .attr("transform", "translate(0,0)")
-	  .call($scope.xAxis);
-	
-	$scope.innerSpace.append("g")
-	  .attr("class", "y axis")
-	  .call($scope.yAxis);
 	  	
 	$scope.gDrawingContainer = $scope.innerSpace.append("g");
 	
@@ -241,11 +258,6 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		scope.toggle();
 	};
 
-	$scope.toggleDebug = function() {
-		$scope.debugOn = !$scope.debugOn;
-		$scope.draw();
-	};
-
 	$scope.toggleControls = function() {
 		$scope.showControls = !$scope.showControls;
 	};
@@ -266,17 +278,26 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		currentNode.editorEnabled = !currentNode.editorEnabled;
 	}
 
-	$scope.toggleJson = function() {
-		$scope.showJson = !$scope.showJson;
-	}
+	
+	$scope.configurePanAndDragBehaviour = function() {
+		var g = $scope.gDrawingContainer.selectAll("g");
+		if ($scope.panMode) {
+//			g.call($scope.zoomBehaviour);
+			$scope.innerSpace.call($scope.zoomBehaviour);
+			g.call($scope.noDragBehaviour);
+		} else {
+			g.call($scope.dragGroup);
+			$scope.innerSpace.call($scope.noZoomBehaviour);
+		}
+	};
+	
+	$scope.togglePanAndDrag = function() {
+		$scope.panMode = !$scope.panMode;
+		$scope.configurePanAndDragBehaviour();
+	};
 
 	$scope.toggleVisible = function() {
 		$scope.currentNode.formatting.visible = !$scope.currentNode.formatting.visible;
-	}
-
-	$scope.toggleOutline = function() {
-		$scope.showOutline = !$scope.showOutline;
-		$scope.draw();
 	}
 
 	$scope.moveLastToTheBeginning = function() {
@@ -323,7 +344,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 			// width: parseInt(a[0][0].children[0].width.baseVal.value),
 			// height: parseInt(a[0][0].children[0].height.baseVal.value)
 	};
-	
+
 	$scope.draw = function() {
 		// calculate the width and height and x coordinate for all elements
 		for (var i = 0; i < $scope.file.length; i++) {
@@ -356,6 +377,14 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 
 		$scope.render();
 	};
+
+	// listen to broadcasts requesting a for a redraw to accur. These come from the MainCtrl
+	// when setting debug on, etc.
+	
+	$scope.$on('redraw', function() {
+		$scope.draw();        
+	});
+	
 
 	$scope.touchstart = function(thresholdValue) {
 		$scope.dragstart(thresholdValue);
@@ -525,7 +554,6 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 
 	$scope.dragmove = function(d) {
 
-		var b = d3.select(this);
 		var svg = d3.select('#svg');
 
 		var currentPosition = {};
@@ -579,53 +607,19 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 	
 	  // Select All Circles
 	  var gContainers = $scope.innerSpace.selectAll(".groupclass");
-	  var rectangles = gContainers.selectAll("rect");
-	  var text = gContainers.selectAll("text");
 
-	  // Pan Vector
-	  //var panVector = d3.event.translate;
-//	  var panX = panVector[0];
-	  //var panY = panVector[1];
-	
 	  // Scaling Multiplier
-	  var scaleMultiplier = d3.event.scale;
+	  $scope.scaleMultiplier = d3.event.scale;
 	
 	  // Redraw the Axis
 	  $scope.innerSpace.select(".x.axis").call($scope.xAxis);
 	  $scope.innerSpace.select(".y.axis").call($scope.yAxis);
 	
-	  // Redraw the Circle
+	  // Redraw the rest
 	  gContainers.attr("transform", function(d) {
 	    return "translate(" + [$scope.xAxisScale(d.formatting.x), $scope.yAxisScale(d.formatting.y)] + ")"
-	    + " scale(" + scaleMultiplier + ")";
+	    + " scale(" + $scope.scaleMultiplier + ")";
 	  });
-	  //rectangles.attr("width", function(d, i) {
-	  //    return scaleMultiplier * d.formatting.width;
-	  //  })
-	  //  .attr("height", function(d, i) {
-	  //    return scaleMultiplier * d.formatting.height;
-	  //  })
-	    
-	  //  text.attr("x", function(d) {
-			// 	if (d.type !== 'formatting') {
-			// 		return (scaleMultiplier * d.formatting.width / 2);
-			// 	}
-			// 	else {
-			// 		return 0;
-			// 	}
-			// })
-			// .attr("y", function(d) {
-			// 	if (d.type !== 'formatting') {
-			// 		if (d.children.length > 0) {
-			// 			return $scope.textPadding
-			// 		}
-			// 		else {
-			// 			return (scaleMultiplier * d.formatting.height / 2);
-			// 		}
-			// 	} else {
-			// 		return 0;
-			// 	}
-			// });
 	
 	}
 
@@ -646,7 +640,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		var center0 = $scope.zoomBehaviour.center();
 		var translate0 = $scope.zoomBehaviour.translate();
 		var coordinates0 = $scope.coordinates(center0);
-		//  zoom.scale(zoom.scale() * Math.pow(2, direction));
+
 		if (direction === 1) {
 			$scope.zoomBehaviour.scale($scope.zoomBehaviour.scale() * 1.2);
 		} else {
@@ -661,6 +655,40 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 	}
 	
 
+	$scope.zReset = function() {
+  		$scope.innerSpace.call($scope.zoomBehaviour.event); // https://github.com/mbostock/d3/issues/2387
+
+		// when reseting the zoom and pan to zero,zero coordinates.
+		
+		// fist, reset the scale of the zoom to 1
+		$scope.zoomBehaviour.scale(1);
+		
+		// // second, reset the x and y to the coordinates of the xAxisScale, which goes from 0 to the defined width
+		// // same for the y
+		// $scope.zoomBehaviour.x($scope.xAxisScale.domain([0, $scope.width]));
+		// $scope.zoomBehaviour.y($scope.yAxisScale.domain([0, $scope.height]));
+
+		// // call the zoom behaviour to apply the changes		
+		// $scope.innerSpace.call($scope.zoomBehaviour.event);
+
+		// this is to reset the zoom scale and pan coordinates to 0,0 using a transition. To do that, apparently we need 
+		// this tween function. Need to look it up a bit more.
+		d3.transition().duration(750).tween("zoom", function() {
+		    var ix = d3.interpolate($scope.xAxisScale.domain(), [0, $scope.width]),
+        		iy = d3.interpolate($scope.yAxisScale.domain(), [0, $scope.height]);
+		    return function(t) {
+				$scope.zoomBehaviour.x($scope.xAxisScale.domain(ix(t))).y($scope.yAxisScale.domain(iy(t)));
+				// Redraw the Axis
+				$scope.innerSpace.select(".x.axis").call($scope.xAxis);
+				$scope.innerSpace.select(".y.axis").call($scope.yAxis);
+				// this will get the other objects to resize to defined scale
+				$scope.innerSpace.call($scope.zoomBehaviour.event);
+		    };
+		  });
+
+
+	}
+	
 	$scope.render = function() {
 
 		// sort the data so objects are drawn in the correct order
@@ -691,7 +719,8 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 			.attr("id", function(d) {
 				return "group_" + d.id
 			})
-			.attr("class", "groupclass")
+			.attr("class", "groupclass");
+
 
 		gEnter.append("rect");
 		gEnter.append("text");
@@ -705,7 +734,8 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 			$scope.doubleclick(d, i);
 		});
 		g.transition().duration(1000).attr("transform", function(d) {
-			return "translate(" + [d.formatting.x, d.formatting.y] + ")";
+	    		return "translate(" + [$scope.xAxisScale(d.formatting.x), $scope.yAxisScale(d.formatting.y)] + ")"
+			         + " scale(" + $scope.scaleMultiplier + ")";
 		})
 
 
@@ -1115,9 +1145,15 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		$scope.currentNode.formatting.height = $scope.currentNode.formatting.height + 20;
 	}
 
+	$scope.resizeSVG = function(by) {
+		$scope.currentFile.svg_width = $scope.currentFile.svg_width === undefined ? +$scope.svg_width + (by) : +$scope.currentFile.svg_width + (by);
+		$scope.initSVG();
+		$scope.draw();
+	};
+	
 	$scope.makeShorter = function() {
 		$scope.currentNode.formatting.height = $scope.currentNode.formatting.height - 20;
-	}
+	};
 
 	$scope.applyHeightToSibilings = function() {
 		var parent = $scope.getParent($scope.currentNode.id)
@@ -1271,7 +1307,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 
 			if (target.type === 'node' && target.id !== objBeingDragged.id && !$scope.targetIsChild(target.id, objBeingDragged.children)) {
 				var overlaping = $scope.isOverlaping(mousex, mousey, target, objBeingDragged);
-				var group = d3.select("#group_" + target.id);
+				//var group = d3.select("#group_" + target.id);
 				console.log(overlaping);
 				//var overlapingWithShiftKey = isOverlapingWithShiftKey(mousex, mousey, obj)
 				if (overlaping) {
@@ -1281,31 +1317,6 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 						force: false
 					});
 					console.log('found ' + target.title);
-
-					if (highlight) {
-						// lets highligth it
-						var classx = overlaping ? "somethingontheright" : "somethingontheleft";
-						group.classed(classx, true);
-						group.classed("groupclass", false);
-						group.style("stroke-width", 2)
-							.style("stroke", "pink");
-					}
-				}
-				else {
-					// Nope, we did not hit any objects yet
-					if (highlight) {
-						// remove highlighting
-						group.style("stroke-width", function(d, i) {
-								return target.formatting.strokeWidth;
-							})
-							.style("stroke", function(d, i) {
-								return target.formatting.borderColor;
-							});
-
-						group.classed("somethingontheright", false);
-						group.classed("somethingontheleft", false);
-						group.classed("groupclass", true);
-					}
 				}
 			}
 		}
@@ -1359,6 +1370,12 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		.on("dragend", $scope.dragend)
 		.on("drag", $scope.dragmove);
 
+	$scope.noDragBehaviour = d3.behavior.drag()
+		.origin(Object)
+		.on("dragstart", null)
+		.on("dragend", null)
+		.on("drag", null);
+
 	$scope.zoomBehaviour = d3.behavior.zoom()
 	  .x($scope.xAxisScale)
 	  .y($scope.yAxisScale)
@@ -1366,14 +1383,9 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 	  .scaleExtent([0.2, 10])
 	  .on("zoom", $scope.zoomFunction);
 
-	$scope.innerSpace.call($scope.zoomBehaviour);
-	  
-	// d3.select("#canvasDiv")
-	//   .on("touchstart", function() {
-	//   	$scope.dragstart.bind(this, 5)();
-	//   })
-	//   .on("touchmove", $scope.dragmove)
-	//   .on("touchend", $scope.dragend);
+	$scope.noZoomBehaviour = d3.behavior.zoom()
+	  .on("zoom", null);
 
-
+	// configure the default behaviour of the SVG element
+	$scope.configurePanAndDragBehaviour();
 }]);

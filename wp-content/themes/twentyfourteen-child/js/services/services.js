@@ -61,6 +61,8 @@ app.service('t9Service', ['$http', '$q', function($http, $q) {
     obj.id = file.id;
     obj.max_node_id = file.max_node_id;
     obj.file_name = file.file_name;
+    obj.svg_height = file.svg_height;
+    obj.svg_width = file.svg_width;
     obj.nodes = file.nodes;
     var promise = $http({
       method: "post",

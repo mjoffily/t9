@@ -47,6 +47,63 @@
 		</div>
 	</div>
 
+	<div flex layout="row" layout-align="space-around" class="tabrow green" ng-show="showControls">
+		<div class="center" flex>
+			<md-button class="md-fab md-primary md-button md-default-theme" ng-click="z(1)">
+				<md-icon md-svg-src="{{ getIcon('newnode.svg') }}"  class="s24" alt="zoom in"></md-icon>
+			</md-button>
+		</div>
+		<div class="center" flex>
+			<md-button class="md-fab md-primary md-button md-default-theme" ng-click="z(-1)">
+				<md-icon md-svg-src="{{ getIcon('sibilingnode.svg') }}"  class="s24" alt="zoom out"></md-icon>
+			</md-button>
+		</div>
+		<div class="center" flex>
+			<md-button class="md-fab md-primary md-button md-default-theme" ng-click="zReset()">
+				<md-icon md-svg-src="{{ getIcon('sibilingnode.svg') }}"  class="s24" alt="zoom reset"></md-icon>
+			</md-button>
+		</div>
+	</div>
+
+	<div flex layout="row" layout-align="space-around" class="tabrow green" ng-show="showControls">
+		<div class="center" flex>
+			<button type="button" class="btn btn-default" ng-click="togglePanAndDrag()">Enable {{panMode ? 'Drag' : 'Pan'}} mode</button>
+		</div>
+	</div>
+
+	<div id="svgsize" flex layout="row" layout-align="space-around" class="tabrow green" ng-show="showControls">
+		<div class="green" flex="50" layout-align="center center">
+			VP Width:
+			<input ng-model="currentFile.svg_width" type="number">
+		</div>
+		<div flex="25" class="green" layout-align="center center">
+			<div flex>
+			<span flex>
+				<md-button class="mdbutton" ng-model="currentFile.svg_width" ng-click="resizeSVG(20)" value="{+currentFile.svg_width}">
+					<md-icon md-svg-src="{{ getIcon('up.svg') }}"  class="s24" alt="Up"></md-icon>
+					<md-tooltip>
+        				Increase viewport width by 20 pixels
+      				</md-tooltip>
+				</md-button>
+			</span>
+			<span flex>
+				<md-button class="mdbutton" ng-model="currentFile.svg_width" ng-click="resizeSVG(-20)" value="{+currentFile.svg_width}">
+					<md-icon md-svg-src="{{ getIcon('down.svg') }}"  class="s24" alt="Down"></md-icon>
+					<md-tooltip>
+        				Decrease viewport width by 20 pixels
+      				</md-tooltip>
+				</md-button>
+			</span>
+			</div>
+		</div>
+
+		<div layout="row" flex="25" class="green" layout-align="center center">
+			<div flex>
+			</div>
+		</div>
+	</div>
+
+
 
 
 	<div id="height" flex layout="row" layout-align="space-around" class="tabrow green" ng-show="showControls">

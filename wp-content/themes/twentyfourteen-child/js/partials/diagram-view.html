@@ -1,5 +1,6 @@
-<div layout="column" layout-fill ng-controller="diagramCtrl">
+<div layout="column" layout-fill >
 
+<!--
   <div flex layout="row">
     <div flex-lg="50" flex-gt-lg="33" flex-md="50" layout="row" layout-align="start start">
       <md-checkbox ng-click="toggleOutline()" aria-label="Show outline" flex>
@@ -13,15 +14,12 @@
       </md-checkbox>
     </div>
   </div>
-
+-->
   <!--<div node-properties template="filter.html" filter="filter" class="" id="filterpropertiesdiv"></div>-->
   <div node-properties class="" id="nodepropertiesdiv"></div>
-  <div id="textSetter" ng-show="showTextSetter" contenteditable="true" style="position: fixed; width: 420px; left: 0px; top: 57px; border: solid; borderColor: black;">this is a text in a div</div>
-    <div><p ng-bind="showJson"></p></div>
-
+  <div id="textSetter" ng-show="showTextSetter" style="position: fixed; width: 420px; left: 0px; top: 57px; border: solid; borderColor: black;">this is a text in a div</div>
   <section flex>
     <div flex layout="row">
-      <div flex="70"><div>SVG {{svgWidth}}</div>
         <div ng-show="showJson"><p> {{showJson}}</p>
           <h3>Data binding</h3>
           <div class="info">

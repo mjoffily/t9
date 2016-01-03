@@ -32,27 +32,3 @@
 </head>
 
 <body ng-app="t9" <?php body_class(); ?>>
-<div>
-	<?php if ( get_header_image() ) : ?>
-	<div id="site-header">
-		<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
-			<img src="<?php header_image(); ?>" width="<?php echo get_custom_header()->width; ?>" height="<?php echo get_custom_header()->height; ?>" alt="">
-		</a>
-	</div>
-	<?php endif; ?>
-
-	<header id="masthead" class="site-header" role="banner">
-		<div class="header-main">
-			<h1 class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></h1>
-
-			<nav id="primary-navigation" class="site-navigation primary-navigation" role="navigation">
-				<button class="menu-toggle"><?php _e( 'Primary Menu', 'twentyfourteen' ); ?></button>
-				<a class="screen-reader-text skip-link" href="#content"><?php _e( 'Skip to content', 'twentyfourteen' ); ?></a>
-	</nav>
-		</div>
-
-	</header><!-- #masthead -->
-<div class="spacer">
-    &nbsp;
-</div>
-	<div class="content">

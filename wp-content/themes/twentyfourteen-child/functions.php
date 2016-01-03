@@ -24,9 +24,10 @@ function t9_scripts() {
 	wp_enqueue_style( 'xeditable', get_stylesheet_directory_uri() . '/css/xeditable.css');
     wp_enqueue_style( 'child-style', get_stylesheet_uri(), array( 'parent-style' ) );
     wp_enqueue_style( 'angular-material', 'https://ajax.googleapis.com/ajax/libs/angular_material/0.8.2/angular-material.min.css' );
+    wp_enqueue_style( 'dropdown-menu', get_stylesheet_directory_uri() . '/css/dropdown-menu.css' );
 
    wp_enqueue_script( 'hammerjs', "https://cdn.jsdelivr.net/hammerjs/2.0.4/hammer.min.js");
-   wp_enqueue_script( 'angular-script', "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular.min.js");
+   wp_enqueue_script( 'angular-script', "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular.js");
    wp_enqueue_script( 'angular-animate', "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-animate.min.js");
    wp_enqueue_script( 'angular-aria', "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-aria.min.js");
    wp_enqueue_script( 'angular-material', "https://ajax.googleapis.com/ajax/libs/angular_material/0.8.2/angular-material.js");

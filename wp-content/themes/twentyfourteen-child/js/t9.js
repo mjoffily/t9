@@ -1,6 +1,9 @@
+/* global SiteParameters*/
+/* global angular */
+
 'use strict';
 
-var app = angular.module('t9', ['colorpicker.module', 'xeditable', 'ui.router', 'ngMaterial', 'ui.bootstrap']);
+var app = angular.module('t9', ['colorpicker.module', 'xeditable', 'ui.router', 'ngMaterial', 'ui.bootstrap', 'ui.bootstrap.tpls']);
 
 app.run(function($rootScope, $state) {
     $rootScope.$state = $state;    

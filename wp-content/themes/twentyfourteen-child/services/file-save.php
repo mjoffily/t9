@@ -4,11 +4,13 @@ require_once 'database-connection.php';
 $postdata = file_get_contents("php://input");
 $request = json_decode($postdata);
 error_log($postdata);
-error_log($request);
+error_log(print_r($request));
 $userid = $request->user;
 $fileId = $request->id;
 $fileName = $request->file_name;
 $maxNodeId = $request->max_node_id;
+$svgWidth = $request->svg_width;
+$svgHeight = $request->svg_height;
 error_log($fileName);
 $nodes = json_encode($request->nodes);
 error_log($nodes);
@@ -19,6 +21,8 @@ if ($fileId == null || $fileId == -1) {
       'userid' => $userid,
       'nodes' => $nodes,
       'max_node_id' => $maxNodeId,
+      'svg_width' => $svgWidth,
+      'svg_height' => $svgHeight,
       'created_date' => DB::sqleval("NOW()")
     ));
     
@@ -29,6 +33,8 @@ if ($fileId == null || $fileId == -1) {
       'file_name' => $fileName,
       'nodes' => $nodes,
       'userid' => $userid,
+      'svg_width' => $svgWidth,
+      'svg_height' => $svgHeight,
       'max_node_id' => $maxNodeId), "id=%i", $fileId);
 }
 

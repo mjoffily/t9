@@ -11,6 +11,9 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 	$scope.serverRootLocation = SiteParameters.theme_directory;
 	$scope.fileList;
 	$scope.loading = false;
+	$scope.debugOn = false;
+	$scope.showJson = false;
+	$scope.showOutline = false;
 
 	$scope.checkAndHandleLocalStorageResult = function(result) {
 		if (result.data !== "no data") {
@@ -108,6 +111,15 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 		var promise = t9Service.fileOpen($scope.user, $scope.fileList[idx].id);
 		promise.then(function(result) {
 			$scope.currentFile = result.data;
+			$scope.currentFile.svg_width = +$scope.currentFile.svg_width;
+			$scope.currentFile.svg_height = +$scope.currentFile.svg_height;
+			if ($scope.currentFile.svg_width === 0) {
+				$scope.currentFile.svg_width = 1200;
+			}
+			if ($scope.currentFile.svg_height === 0) {
+				$scope.currentFile.svg_height = 1200;
+			}
+			
 			$scope.flattenFile($scope.currentFile.nodes, undefined);
 			$scope.flatNodesForSelectedFile = $scope.dataflat.flatnodes;
 			$scope.flatIndexedNodesForSelectedFile = $scope.dataflat.flatindexedNodes;
@@ -171,6 +183,9 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 	};
 	
 	$scope.addNewNodeAsSibiling = function() {
+
+		// copy nodes to undo stack before making the change
+		$scope.undoStack.push(JSON.parse(JSON.stringify($scope.currentFile.nodes)));
 		// add node as a sibiling to the selected node
 		if ($scope.currentNode) {
 			var a = $scope.getNewNode();
@@ -400,5 +415,19 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
       $log.info('Modal dismissed at: ' + new Date());
     });
   };
+
+	$scope.toggleDebug = function() {
+		$scope.debugOn = !$scope.debugOn;
+		 $scope.$broadcast ('redraw');
+	};
+
+	$scope.toggleJson = function() {
+		$scope.showJson = !$scope.showJson;
+	}
+
+	$scope.toggleOutline = function() {
+		$scope.showOutline = !$scope.showOutline;
+		$scope.$broadcast ('redraw');
+	}
 
 }]);
