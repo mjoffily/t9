@@ -194,8 +194,7 @@
 	</div>
 	<div id="fillcolor" flex layout="row" layout-align="space-around" class="tabrow green" ng-show="showControls">
 		<div class="green" flex="50" layout-align="center center">
-			Fill color:
-			<input id=color colorpicker ng-model="currentNode.formatting.fill" type="text" >
+			Fill color:<colorchooser my-color="currentNode.formatting.fill" ></colorchooser>
 		</div>
 		<div flex="25" class="green" layout-align="center center">
 			<div flex></div>
@@ -376,7 +375,7 @@
 	<div id="fontcolor" flex layout="row" layout-align="space-around" class="tabrow green" ng-show="showControls">
 		<div class="green" flex="50" layout-align="center center">
 			Font color:
-			<input id=fontcolorinput colorpicker ng-model="currentNode.formatting.fontColor" type="text" >
+			<colorchooser my-color="currentNode.formatting.fontColor" ></colorchooser>
 		</div>
 		<div flex="25" class="green" layout-align="center center">
 			<div flex></div>

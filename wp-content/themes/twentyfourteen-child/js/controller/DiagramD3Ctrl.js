@@ -540,6 +540,8 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 			$scope.draggingInProgress = false;
 			return;
 		}
+		// copy nodes to undo stack before making the change
+		$scope.addToUndoStack("drag & drop");
 
 		$scope.removeDraggedObjectFromCurrentLocation(d);
 

@@ -1,4 +1,4 @@
-app.directive("nodeProperties", function() {
+app.directive("nodeProperties", function($timeout) {
 	return {
 		link: function(scope, element, attr) {
 			scope.dragDivStart = function(d) {
@@ -7,7 +7,6 @@ app.directive("nodeProperties", function() {
 
 			scope.dragDivMove = function(d) {
 				var a = d3.select(this);
-				console.log(d3.event.dx, d3.event.dy, a.style("right"));
 				a.style({
 					right: (parseInt(a.style("right")) - parseInt(d3.event.dx)) + "px",
 					top: d3.event.dy + parseInt(a.style("top")) + "px"
@@ -20,6 +19,7 @@ app.directive("nodeProperties", function() {
 				.on("drag", scope.dragDivMove);
 
 			d3.select('#' + attr.id).call(scope.dragDiv);
+
 		},
 		templateUrl: SiteParameters.theme_directory + '/js/partials/popup.html'
 	};

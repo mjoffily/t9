@@ -1,0 +1,105 @@
+.simpleSwatchPicker {
+  position: relative !important;
+  width: 3em;
+  height: 3em;
+}
+
+.simpleSwatchPicker .sspSelectedChip {
+  position: relative;
+  width: 3em;
+  height: 3em;
+  border: 1px solid #cccccc;
+  background-color: white;
+  overflow: hidden !important;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.simpleSwatchPicker .sspSelectedChip span {
+  display: block;
+  text-align: center;
+  font-size: 0.5em;
+  font-family: sans-serif;
+  font-style: italic;
+  line-height: 1;
+  padding: 1em;
+  color: #000;
+}
+
+.simpleSwatchPicker .sspSelectedChip:hover {
+  border-color: #bbbbbb;
+}
+
+.simpleSwatchPicker .sspChip {
+  width: 1em;
+  height: 1em;
+  border-left: 1px solid #cccccc;
+  border-top: 1px solid #cccccc;
+  float: left !important;
+}
+
+.simpleSwatchPicker .sspChip:hover {
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.simpleSwatchPicker .sspPalette {
+  position: absolute !important;
+  top: 0 !important;
+  z-index: 10000 !important;
+  background: white;
+  /* h, w will be set by script to fit rows, cols */
+  border-right: 1px solid #cccccc;
+  border-bottom: 1px solid #cccccc;
+  width: 10px;
+  height: 10px;
+  left: 10px;
+  
+}
+
+@keyframes closing-animation {
+0% { opacity: 1; -webkit-transform: scale(1);}
+85% {opacity: 1; -webkit-transform: scale(1.05);}
+100% {-webkit-transform: scale(.1); opacity: 0;}
+}
+
+@keyframes slideDown {
+	0% {
+		transform: translateY(-100%);
+	}
+	100% {
+		transform: translateY(0%);
+	}		
+}
+@keyframes slideUp {
+	0% {
+		transform: translateY(0%);
+	}
+	90%{
+		transform: translateY(-90%);
+	}
+	100% {
+		transform: translateY(-100%);
+	}		
+}
+
+.simpleSwatchPicker .opened {
+	visibility: visible !important;						
+  opacity: 1;
+  animation-duration: 0.5s;
+ 	animation-timing-function: ease;	
+  animation-name:slideDown;
+}
+
+
+
+.simpleSwatchPicker .closed {
+  animation-name: slideUp;
+  animation-duration: 0.5s;
+ 	animation-timing-function: linear;	
+  transition:visibility 0.5s linear ,opacity 0.5s linear; 
+  opacity:0;
+   visibility: hidden;
+}

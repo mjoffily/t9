@@ -1,0 +1,44 @@
+.simpleSwatchPicker {
+  position: relative !important;
+  width: 3em;
+  height: 3em; }
+  .simpleSwatchPicker .sspSelectedChip {
+    position: relative;
+    width: 3em;
+    height: 3em;
+    border: 1px solid #cccccc;
+    background-color: white;
+    overflow: hidden !important;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px; }
+    .simpleSwatchPicker .sspSelectedChip span {
+      display: block;
+      text-align: center;
+      font-size: 0.5em;
+      font-family: sans-serif;
+      font-style: italic;
+      line-height: 1;
+      padding: 1em;
+      color: #000; }
+  .simpleSwatchPicker .sspSelectedChip:hover {
+    border-color: #bbbbbb; }
+  .simpleSwatchPicker .sspChip {
+    width: 1em;
+    height: 1em;
+    border-left: 1px solid #cccccc;
+    border-top: 1px solid #cccccc;
+    float: left !important; }
+  .simpleSwatchPicker .sspChip:hover {
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px; }
+  .simpleSwatchPicker .sspPalette {
+    position: absolute !important;
+    top: 0 !important;
+    z-index: 10000 !important;
+    display: none;
+    background: white;
+    /* h, w will be set by script to fit rows, cols */
+    border-right: 1px solid #cccccc;
+    border-bottom: 1px solid #cccccc; }
