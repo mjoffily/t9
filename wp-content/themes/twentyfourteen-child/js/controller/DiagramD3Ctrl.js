@@ -193,7 +193,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		scope.remove();
 	};
 
-	$scope.applyFormattingToSibilings = function(currentNode, field, sameParentOnly) {
+	$scope.applyFormattingToSibilingsOld = function(currentNode, field, sameParentOnly) {
 
 		var getter = $parse('formatting.' + field);
 		var setter = getter.assign;
@@ -227,7 +227,10 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		}
 	}
 
-	$scope.applyFormattingToSibilingsNew = function(currentNode, field, sameParentOnly) {
+	$scope.applyFormattingToSibilings = function(currentNode, field, sameParentOnly) {
+
+		// copy nodes to undo stack before making the change
+		$scope.addToUndoStack("apply formatting to sibilings");
 
 		if (!sameParentOnly) {
 			$scope.buildReferencesToNodesPerLevel();
@@ -247,10 +250,11 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 
 			for (var i = 0; i < siblings.length; i++) {
 				if (siblings[i].type === 'node') {
-					siblings[i].formatting = $scope.currentNode.formatting[field];
+					siblings[i].formatting[field] = $scope.currentNode.formatting[field];
 				}
 			}
 		}
+		$scope.draw();
 	}
 
 	$scope.toggle = function(scope) {
@@ -386,6 +390,16 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 	
 	$scope.$on('undo', function() {
 		$scope.file = $scope.currentFile.nodes;
+		$scope.gDrawingContainer.selectAll("*").remove();
+		$scope.draw();        
+	});
+	
+	$scope.$on('fileNew', function() {
+		$scope.gDrawingContainer.selectAll("*").remove();
+		$scope.draw();        
+	});
+	
+	$scope.$on('fileClose', function() {
 		$scope.gDrawingContainer.selectAll("*").remove();
 		$scope.draw();        
 	});
@@ -1134,14 +1148,9 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		});
 	};
 
-	$scope.undo = function() {
-		
-	}
-
 	$scope.$watch("currentNode", function(newValue, oldValue) {
 		// add to undo stack
 		if (!$scope.draggingInProgress) {
-//			$scope.undoStack.push(oldValue);
 			$scope.draw();
 		}
 	}, true);
@@ -1151,6 +1160,8 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 	}
 
 	$scope.makeTaller = function() {
+		// copy nodes to undo stack before making the change
+		$scope.addToUndoStack("make taller");
 		$scope.currentNode.formatting.height = $scope.currentNode.formatting.height + 20;
 	}
 
@@ -1161,12 +1172,16 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 	};
 	
 	$scope.makeShorter = function() {
+		// copy nodes to undo stack before making the change
+		$scope.addToUndoStack("make shorter");
 		$scope.currentNode.formatting.height = $scope.currentNode.formatting.height - 20;
 	};
 
 	$scope.applyHeightToSibilings = function() {
 		var parent = $scope.getParent($scope.currentNode.id)
 		if (parent && parent.children.length > 0) {
+			// copy nodes to undo stack before making the change
+			$scope.addToUndoStack("apply height to sibilings");
 			for (var i = 0; i < parent.children.length; i++) {
 				if (parent.children[i].type === 'node') {
 					parent.children[i].formatting.height = $scope.currentNode.formatting.height;
@@ -1178,6 +1193,8 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 	$scope.applyWidthToSibilings = function() {
 		var parent = $scope.getParent($scope.currentNode.id)
 		if (parent && parent.children.length > 0) {
+			// copy nodes to undo stack before making the change
+			$scope.addToUndoStack("apply width to sibilings");
 			for (var i = 0; i < parent.children.length; i++) {
 				if (parent.children[i].type === 'node') {
 					parent.children[i].formatting.width = $scope.currentNode.formatting.width;
@@ -1187,24 +1204,36 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 	}
 
 	$scope.makeLessLong = function() {
+		// copy nodes to undo stack before making the change
+		$scope.addToUndoStack("make shorter");
 		$scope.currentNode.formatting.width = $scope.currentNode.formatting.width - 20;
 	}
 
 	$scope.makeLonger = function() {
+		// copy nodes to undo stack before making the change
+		$scope.addToUndoStack("make longer");
 		$scope.currentNode.formatting.width = $scope.currentNode.formatting.width + 20;
 	}
 
 	$scope.increaseFontSize = function() {
+		// copy nodes to undo stack before making the change
+		$scope.addToUndoStack("increase font size");
 		$scope.currentNode.formatting.fontSize = $scope.currentNode.formatting.fontSize + 1;
 	}
 
 	$scope.decreaseFontSize = function() {
+		// copy nodes to undo stack before making the change
+		$scope.addToUndoStack("decrease font size");
 		$scope.currentNode.formatting.fontSize = $scope.currentNode.formatting.fontSize - 1;
 	}
 	$scope.makeStrokeThicker = function() {
+		// copy nodes to undo stack before making the change
+		$scope.addToUndoStack("make stroke thicker");
 		$scope.currentNode.formatting.strokeWidth = $scope.currentNode.formatting.strokeWidth + 1;
 	}
 	$scope.makeStrokeThinner = function() {
+		// copy nodes to undo stack before making the change
+		$scope.addToUndoStack("make stroke thinner");
 		$scope.currentNode.formatting.strokeWidth = $scope.currentNode.formatting.strokeWidth - 1;
 	}
 

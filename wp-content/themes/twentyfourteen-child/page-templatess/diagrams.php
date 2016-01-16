@@ -4,7 +4,7 @@
 <ul>
    <li class='active has-sub'><a href='#'><span>File</span></a>
       <ul>
-         <li><a href='' ng-click="newFile()"><span>New</span></a></li>
+         <li><a href='' ng-click="fileNew()"><span>New</span></a></li>
          <li class="has-sub"><a href='#'><span>Open</span></a>
             <ul>
                 <li ng-repeat="file in fileList track by $index" value="{{file.id}}"><a href="" ng-click="fileOpen($index)">{{file.file_name}}</a></li>
@@ -12,7 +12,7 @@
          </li>
          <li><a href='' ng-click="save()"><span>Save</span></a></li>
          <li><a href='#'><span>Save as</span></a></li>
-         <li><a href='#'><span>Close</span></a></li>
+         <li><a href='' ng-click="fileClose()"><span>Close</span></a></li>
       </ul>
    </li>
    <li class='active has-sub'><a href='#'><span>Edit</span></a>

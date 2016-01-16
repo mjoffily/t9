@@ -27,7 +27,7 @@ function t9_scripts() {
     wp_enqueue_style( 'dropdown-menu', get_stylesheet_directory_uri() . '/css/dropdown-menu.css' );
     wp_enqueue_style( 'colorchooser', get_stylesheet_directory_uri() . '/css/colorchooser.css' );
 
-   wp_enqueue_script( 'jqueryy', get_stylesheet_directory_uri() . '/js/_lib/jquery-2.1.4.min.js');
+//   wp_enqueue_script( 'jqueryy', get_stylesheet_directory_uri() . '/js/_lib/jquery-2.1.4.min.js');
    wp_enqueue_script( 'hammerjs', "https://cdn.jsdelivr.net/hammerjs/2.0.4/hammer.min.js");
    wp_enqueue_script( 'angular-script', "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular.js");
    wp_enqueue_script( 'angular-animate', "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-animate.min.js");
@@ -44,7 +44,7 @@ function t9_scripts() {
 //    wp_enqueue_script( 'ngDialog-script', get_stylesheet_directory_uri() . '/js/_lib/ngDialog.js');
     wp_enqueue_script( 'xeditable-script', get_stylesheet_directory_uri() . '/js/_lib/xeditable.js');
     wp_enqueue_script( 'd3-script', get_stylesheet_directory_uri() . '/js/_lib/d3.js');
-    wp_enqueue_script( 'simple-swatch-color-picker', get_stylesheet_directory_uri() . '/js/_lib/jquery.simpleSwatchPicker.js');
+//    wp_enqueue_script( 'simple-swatch-color-picker', get_stylesheet_directory_uri() . '/js/_lib/jquery.simpleSwatchPicker.js');
     wp_enqueue_script( 't9-script', get_stylesheet_directory_uri() . '/js/t9.js');
     wp_enqueue_script( 'services-script', get_stylesheet_directory_uri() . '/js/services/services.js');
     wp_enqueue_script( 'diagram-controller-script', get_stylesheet_directory_uri() . '/js/controller/DiagramD3Ctrl.js');

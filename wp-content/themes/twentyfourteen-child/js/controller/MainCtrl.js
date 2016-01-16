@@ -136,21 +136,53 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 		$scope.flatIndexedNodesForSelectedFile = $scope.dataflat.flatindexedNodes;
 	};
 
-	$scope.newFile = function() {
+	$scope.fileNew = function() {
+		
+		//TODO add logic to save and close current file
+		// broadcast message so the house keeping can take place:
+
+		$scope.$broadcast ('fileNew');
 		var a = {
 			"id": -1,
 			"max_node_id": 0,
-			"file_name": "unnamed",
+			"svg_height":800,
+    		"svg_width":1200,
+    			"file_name": "unnamed",
 			"nodes": []
 		};
 		
 		// set this as the current file
 		$scope.currentFile = a;
+		$scope.currentFile.svg_width = +$scope.currentFile.svg_width;
+		$scope.currentFile.svg_height = +$scope.currentFile.svg_height;
+		if ($scope.currentFile.svg_width === 0) {
+			$scope.currentFile.svg_width = 1200;
+		}
+		if ($scope.currentFile.svg_height === 0) {
+			$scope.currentFile.svg_height = 1200;
+		}
+			
+		$scope.flatten();
 
-		$scope.flattenFile($scope.currentFile.nodes, undefined);
 		$state.go('home.file.diagram', {
 			idx: -1
 		});
+	};
+
+	$scope.fileClose = function() {
+		
+		//TODO add logic to save and close current file
+		// broadcast message so the house keeping can take place:
+
+		$scope.$broadcast ('fileClose');
+
+		// set this as the current file
+		$scope.currentFile = undefined;
+		$scope.flatNodesForSelectedFile = undefined;
+		$scope.flatIndexedNodesForSelectedFile = undefined;
+
+		$state.go('home');
+
 	};
 
 	$scope.getNextId = function() {
