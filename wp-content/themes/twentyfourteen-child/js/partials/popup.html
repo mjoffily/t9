@@ -103,6 +103,38 @@
 		</div>
 	</div>
 
+	<div id="marginLeft" flex layout="row" layout-align="space-around" class="tabrow green" ng-show="showControls">
+		<div class="green" flex="50" layout-align="center center">
+			Margin:
+			<input ng-model="currentNode.formatting.marginLeft" type="number">
+		</div>
+		<div flex="25" class="green" layout-align="center center">
+			<div flex>
+			<span flex>
+				<md-button class="mdbutton" ng-model="currentNode.formatting.marginLeft" ng-click="" value="{+currentNode.formatting.marginLeft}">
+					<md-icon md-svg-src="{{ getIcon('up.svg') }}"  class="s24" alt="Up"></md-icon>
+					<md-tooltip>
+        				Increase margin by 20 pixels
+      				</md-tooltip>
+				</md-button>
+			</span>
+			<span flex>
+				<md-button class="mdbutton" ng-model="currentNode.formatting.marginLeft" ng-click="" value="{+currentNode.formatting.marginLeft}">
+					<md-icon md-svg-src="{{ getIcon('down.svg') }}"  class="s24" alt="Down"></md-icon>
+					<md-tooltip>
+        				Decrease margin by 20 pixels
+      				</md-tooltip>
+				</md-button>
+			</span>
+			</div>
+		</div>
+
+		<div layout="row" flex="25" class="green" layout-align="center center">
+			<div flex>
+			</div>
+		</div>
+	</div>
+
 
 
 

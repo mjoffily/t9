@@ -103,6 +103,19 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 		return $scope.flatIndexedNodesForSelectedFile[id].node;
 	};
 
+	$scope.addMargins = function(nodes) {
+		// temporary fix to set new formatting fields
+		for (var i = 0; i<nodes.length; i++) {
+			var node = nodes[i];
+			if (node.type === "node") {
+				if (node.children.length > 0) {
+					$scope.addMargins(node.children);
+				}
+				node.formatting.marginLeft = 10;
+				node.formatting.marginRight = 0;
+			}
+		}
+	};
 
 	$scope.fileOpen = function(idx) {
 		if (idx === "") {
@@ -120,7 +133,8 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 			if ($scope.currentFile.svg_height === 0) {
 				$scope.currentFile.svg_height = 1200;
 			}
-			
+			// TODO remove this
+			$scope.addMargins($scope.currentFile.nodes);
 			$scope.flatten();
 			$state.go('home.file.diagram', {
 				idx: idx
@@ -202,6 +216,8 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 				strokeWidth: 2,
 				width: 100,
 				height: 100,
+				marginLeft: 10,
+				marginRight: 0,
 				fillOpacity: 1.0,
 				visible: true,
 				showas: 'rectangle',

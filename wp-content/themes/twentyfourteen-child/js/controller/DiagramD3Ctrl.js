@@ -348,16 +348,17 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 			// height: parseInt(a[0][0].children[0].height.baseVal.value)
 	};
 
-	$scope.draw = function() {
-		// calculate the width and height and x coordinate for all elements
+	$scope.calculateWidthHeightAndX = function() {
 		for (var i = 0; i < $scope.file.length; i++) {
 			var node = $scope.file[i];
 			$scope.sumWidth(i, node, node.children, $scope.file);
 			$scope.sumHeight(i, node, node.children, $scope.file);
 		}
+	};
 
-
+	$scope.calculateY = function() {
 		//calculate the y coordinate and render all nodes
+		var node = {};
 		var offset = 0;
 		var offsetTop = 0;
 		var heighest = 0;
@@ -377,7 +378,11 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 				siblings: $scope.file
 			});
 		}
-
+	};
+	
+	$scope.draw = function() {
+		$scope.calculateWidthHeightAndX();
+		$scope.calculateY();
 		$scope.render();
 	};
 
@@ -982,9 +987,12 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 		if (elemIdx >= 1) {
 			if (elemPeers[previousElementIdx].type !== 'formatting') {
 				if (elem.type !== 'formatting' || (elem.type === 'formatting' && $scope.showOutline)) {
-					elem.formatting.x = elemPeers[previousElementIdx].formatting.x + elemPeers[previousElementIdx].formatting.width + $scope.padding;
+					elem.formatting.x = elemPeers[previousElementIdx].formatting.x 
+					+ elemPeers[previousElementIdx].formatting.width
+					+ elemPeers[previousElementIdx].formatting.marginRight
+					+ elem.formatting.marginLeft;
 				} else { // this is a line break and we are not showing the outline. 
-					elem.formatting.x = 0;
+					elem.formatting.x = elem.formatting.marginLeft;
 				}
 			}
 			else if (parent) {
@@ -999,7 +1007,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 			elem.formatting.x = parent.formatting.x + $scope.padding;
 		}
 		else {
-			elem.formatting.x = 0;
+			elem.formatting.x = elem.formatting.marginLeft;
 		}
 
 		for (var i = 0; i < children.length; i++) {

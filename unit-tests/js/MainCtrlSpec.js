@@ -28,10 +28,6 @@ describe("MainCtrl", function() {
             $stateParams = {
                 idx: 0
             };
-            $scope.data = [];
-            $scope.data[$stateParams.idx] = {
-                nodes: []
-            };
             ctrl = $controller('diagramCtrl', {
                 $scope: $scope,
                 't9Service': t9Service,
@@ -40,7 +36,7 @@ describe("MainCtrl", function() {
                 '$q': $q
             });
             
-            $scope.data[$stateParams.idx] = {
+            $scope.currentFile = {
                 nodes: [{
                     id: 1,
                     children: [{
@@ -72,7 +68,7 @@ describe("MainCtrl", function() {
 
     describe('function buildReferencesToNodesPerLevel', function() {
         beforeEach(function() {
-            $scope.data[$stateParams.idx] = {
+            $scope.currentFile = {
                 nodes: [{
                     id: 1,
                     children: [{
