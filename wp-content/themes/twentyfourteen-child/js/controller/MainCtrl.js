@@ -449,29 +449,8 @@ app.controller('mainCtrl', ['$scope', 't9Service', '$state', '$stateParams', '$q
 		$scope.addToUndoStack("add new node as a child");
 
 		var parentNode = $scope.currentNode;
-		var id = $scope.getNextId();
-		var newNode = {
-			id: id,
-			type: parentNode.type,
-			title: id + '',
-			formatting: {
-				strokeWidth: 2,
-				showas: 'rectangle',
-				borderColor: 'black',
-				visible: true,
-				width: 0,
-				height: 0,
-				fillOpacity: 1.0,
-				fill: '#B19CD8',
-				fontFamily: 'Verdana',
-				fontColor: '#FFFFFF',
-				textStrokeWidth: 0,
-				fontSize: 10,
-				level: parentNode.formatting.level + 1
-			},
-			metadata: [],
-			children: []
-		};
+		var newNode = $scope.getNewNode();
+		newNode.formatting.level = parentNode.formatting.level + 1;
 		parentNode.children.push(newNode);
 		$scope.flatNodesForSelectedFile.push(newNode);
 		$scope.flatIndexedNodesForSelectedFile[newNode.id] = {node: newNode, parent: parentNode};

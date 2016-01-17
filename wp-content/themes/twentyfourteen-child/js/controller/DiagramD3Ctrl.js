@@ -995,18 +995,18 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 					elem.formatting.x = elem.formatting.marginLeft;
 				}
 			}
-			else if (parent) {
-				elem.formatting.x = parent.formatting.x + $scope.padding;
+			else if (parent) { // previous was a linebreak inside the parent object. So not level zero
+				elem.formatting.x = parent.formatting.x + elem.formatting.marginLeft;
 			}
-			else {
-				elem.formatting.x = 0;
+			else { // previous was a line break at level zero. 
+				elem.formatting.x = elem.formatting.marginLeft;
 			}
 
 		}
-		else if (parent) {
-			elem.formatting.x = parent.formatting.x + $scope.padding;
+		else if (parent) { // first element with parent
+			elem.formatting.x = parent.formatting.x + elem.formatting.marginLeft;
 		}
-		else {
+		else { // first element and no parent
 			elem.formatting.x = elem.formatting.marginLeft;
 		}
 
@@ -1023,12 +1023,14 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 			// initialize the x of the child element a bit to the right of the border of the elem.
 			// This will change further down if the element has sibillings.
 			if (child.type !== 'formatting' || (child.type === 'formatting' && $scope.showOutline)) {
-				child.formatting.x = elem.formatting.x + $scope.padding;
+				child.formatting.x = elem.formatting.x + child.formatting.marginLeft;
 
 				// if the element has sibilling, offset the x taking into account the x of the sibilling
 				if (previousChildIdx >= 0) {
 					if (children[previousChildIdx].type !== 'formatting') {
-						child.formatting.x = children[previousChildIdx].formatting.x + children[previousChildIdx].formatting.width + $scope.padding;
+						child.formatting.x = children[previousChildIdx].formatting.x 
+						+ children[previousChildIdx].formatting.width 
+						+ child.formatting.marginLeft;
 					}
 				}
 			}
@@ -1038,7 +1040,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 			}
 			
 			// Set the width of the child. If it is a linebreak, set it to zero so we don't mess up the formatting
-			// Do that UNLESS it we want to show the outline, in which case, we give the linebreak a width so we can
+			// Do that UNLESS we want to show the outline, in which case, we give the linebreak a width so we can
 			// se it on the screen
 			if (child.type === 'formatting' && !$scope.showOutline) {
 					child.formatting.width = 0;
@@ -1048,7 +1050,7 @@ app.controller('diagramCtrl', ['$scope', '$parse', '$stateParams', '$mdSidenav',
 				}
 
 				// save width for the current line
-				widthPerLine[idx] = widthPerLine[idx] + child.formatting.width + $scope.padding;
+				widthPerLine[idx] = widthPerLine[idx] + child.formatting.width + child.formatting.marginLeft;
 			}
 		};
 
